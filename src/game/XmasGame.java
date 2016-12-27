@@ -144,7 +144,7 @@ public class XmasGame extends BasicGame {
                             new Image("assets/other/explosion_raw_10.png")
                     },
                     new int[] {150  ,100,100,100,100,100,100,100,100,100}, false
-            )));
+            ), angryCatSound));
         }
 
         // building collision and game maps based on tile properties in the TileD map
@@ -185,7 +185,6 @@ public class XmasGame extends BasicGame {
     public void update(GameContainer container, int delta) throws SlickException {
         Input input = container.getInput();
         spawnCats();
-        //explosionAnimation.update(delta);
 
         /* dealing with the presents */
 
@@ -232,11 +231,14 @@ public class XmasGame extends BasicGame {
 
         /* Updating CAT SWARM */
         for (ChasingCat cat : catSwarm){
-            if (cat.isDying()){
+            cat.setTargetPosition(playerCharacter.getX(), playerCharacter.getY());
+            if (cat.isAlive()) {
                 cat.update(delta);
-            }
-            else if (cat.isAlive()){
-                chasingCatUpdate(cat, playerCharacter.getX(), playerCharacter.getY(), delta);
+                if (!cat.isAlive()) {
+                    if (playerScore > 0) {
+                        playerScore--;
+                    }
+                }
             }
         }
 
@@ -306,63 +308,6 @@ public class XmasGame extends BasicGame {
             }
         }
 
-    }
-
-    private void chasingCatUpdate(ChasingCat cat, float targetX, float targetY, int delta){
-        /* Defining Cat Motion - Follows after target*/
-        float catSpeed = 0.1f;
-        // If cat has reached its target... kill it!
-        if ((targetX + SIZE > cat.getX() && targetX - 1 < cat.getX()) &&
-            (targetY + SIZE > cat.getY() && targetY - 1 < cat.getY()) ){
-            cat.kill();
-            angryCatSound.play();
-            if (playerScore > 0){
-                playerScore --;
-            }
-        }
-        else {
-            cat.update(delta);
-            // When traveling diagonally maintain last animation direction
-            if (abs(targetX - cat.getX()) + 1 > abs(targetY - cat.getY()) &&
-                    abs(targetX - cat.getX()) - 1 < abs(targetY - cat.getY())) {
-                if (abs(targetX - cat.getX()) > abs(targetY - cat.getY())) {
-                    if (targetX > cat.getX() + 1) {
-                        cat.setX(cat.getX() + delta * catSpeed);
-                    } else {
-                        cat.setX(cat.getX() - delta * catSpeed);
-                    }
-                }
-                else {
-                    if (targetY > cat.getY() + 1) {
-                        cat.setY(cat.getY() + delta * catSpeed);
-                    } else {
-                        cat.setY(cat.getY() - delta * catSpeed);
-                    }
-                }
-            }
-            // Left right travel
-            else if (abs(targetX - cat.getX()) > abs(targetY - cat.getY())) {
-                if (targetX > cat.getX() + 1) {
-                    cat.setAnimation(Character.AnimationDirection.RIGHT);
-                    cat.setX(cat.getX() + delta * catSpeed);
-                }
-                else {
-                    cat.setAnimation(Character.AnimationDirection.LEFT);
-                    cat.setX(cat.getX() - delta * catSpeed);
-                }
-            }
-            // Up down travel
-            else {//if (abs(targetX-cat.getX()) < abs(targetY-yCat)) {
-                if (targetY > cat.getY() + 1) {
-                    cat.setAnimation(Character.AnimationDirection.DOWN);
-                    cat.setY(cat.getY() + delta * catSpeed);
-                }
-                else {
-                    cat.setAnimation(Character.AnimationDirection.UP);
-                    cat.setY(cat.getY() - delta * catSpeed);
-                }
-            }
-        }
     }
 
 }
