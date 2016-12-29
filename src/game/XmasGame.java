@@ -27,6 +27,7 @@ public class XmasGame extends BasicGame {
     private static final int SIZE = 64; // Tile size
     private int playerScore;
     private PlayerCharacter playerCharacter;
+    private static Input playerInput;
 
     public XmasGame() {
         super("Xmas Game");
@@ -49,6 +50,7 @@ public class XmasGame extends BasicGame {
         Animation upCat, downCat, leftCat, rightCat;
 
         // Initializing score
+        playerInput = container.getInput();
         playerScore = 0;
 
         // Defining game map asset
@@ -151,14 +153,17 @@ public class XmasGame extends BasicGame {
             for (int yAxis=0; yAxis < xmasMap.getHeight(); yAxis++) {
                 // Getting spawn points and goal blocks
                 int tileID = xmasMap.getTileId(xAxis, yAxis, MapLayers.GAME.getValue());
+                // Building map of player spawn points... TODO: Implement player spawn map
                 String value = xmasMap.getTileProperty(tileID, "playerSpawn", "false");
                 if ("true".equals(value)) {
                     playerSpawn[xAxis][yAxis] = true;
                 }
+                // Building map of cat spawn points.
                 value = xmasMap.getTileProperty(tileID, "catSpawn", "false");
                 if ("true".equals(value)) {
                     catSpawn[xAxis][yAxis] = true;
                 }
+                // Building goal map.... TODO: Implement goal map.
                 value = xmasMap.getTileProperty(tileID, "goal", "false");
                 if ("true".equals(value)) {
                     goalBlock[xAxis][yAxis] = true;
@@ -222,7 +227,6 @@ public class XmasGame extends BasicGame {
 
         /* Updating CAT SWARM */
         for (ChasingCat cat : catSwarm) {
-            cat.setTargetPosition(playerCharacter.getX(), playerCharacter.getY());
             if (cat.isAlive()) {
                 cat.update(delta);
                 if (!cat.isAlive()) {
