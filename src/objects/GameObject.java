@@ -1,11 +1,15 @@
 package objects;
 
+import java.awt.geom.Rectangle2D;
+
 /**
  * @author Daniel J. Holland
  * @version 1.0
  * Created on 12/28/2016.
  */
 public abstract class GameObject {
+
+    private Rectangle2D rect;
 
     // Getters
     public abstract float getX();
@@ -18,10 +22,9 @@ public abstract class GameObject {
     public abstract void setPosition(float xPos, float yPos);
 
     public boolean isColliding(GameObject other){
-        return (((this.getX() >= other.getX() && this.getX() <= other.getX() + other.getWidth()) ||
-                (this.getX() + this.getWidth() >= other.getX() && this.getX() + this.getWidth() <= other.getX() + other.getWidth())) &&
-                ((this.getY() >= other.getY() && this.getY() <= other.getY() + other.getHeight()) ||
-                (this.getY() + this.getHeight() >= other.getY() && this.getY() + this.getHeight() <= other.getY() + other.getHeight())));
+        return (this.getX() < other.getX() + other.getWidth() && this.getX() + this.getWidth() > other.getX() &&
+                this.getY() < other.getY() + other.getHeight() && this.getY() + this.getHeight() > other.getY());
+
     }
 
 }
