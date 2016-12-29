@@ -49,6 +49,24 @@
    </properties>
   </tile>
  </tileset>
+ <tileset firstgid="22" name="game_blocks" tilewidth="64" tileheight="64" tilecount="3" columns="3">
+  <image source="tiles/game_layer/game_blocks.png" width="192" height="64"/>
+  <tile id="0">
+   <properties>
+    <property name="goal" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="playerSpawn" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="catSpawn" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
  <layer name="background" width="10" height="10">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC2NhYGBgIRKzEcC0VscOxBxQzIlHHRcQc0MxDx51vEDMB8X8dPAHtrBEFwcArmLaypABAAA=
@@ -57,6 +75,11 @@
  <layer name="foreground" width="10" height="10">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC2NgGBxAAIgFiVAnBMTCRKgTAWJRilw0MAAARY/ROJABAAA=
+  </data>
+ </layer>
+ <layer name="game" width="10" height="10">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC2NgGAWDCQAADA0iRpABAAA=
   </data>
  </layer>
 </map>

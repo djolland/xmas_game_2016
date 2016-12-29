@@ -7,7 +7,7 @@ import org.newdawn.slick.Animation;
  * @version 1.0
  * Created on 12/25/2016.
  */
-public abstract class Character {
+public class Character extends GameObject{
 
     public enum AnimationDirection {
         UP, DOWN, LEFT, RIGHT
@@ -56,6 +56,8 @@ public abstract class Character {
     public float getHeight(){
         return characterSprite.getHeight();
     }
+
+    public float getWidth(){return characterSprite.getWidth();}
 
     public Animation getUpAnimation(){
         return upAnim;

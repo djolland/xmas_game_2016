@@ -7,7 +7,7 @@ import org.newdawn.slick.Animation;
  * @version 1.0
  * Created on 12/26/2016.
  */
-public class Present {
+public class Present extends GameObject{
 
     private Animation currentAnimation;
     private Animation visibleAnimation;
@@ -25,11 +25,11 @@ public class Present {
 
     }
 
-    public void setXPosition(float xPos){
+    public void setX(float xPos){
         this.xPos = xPos;
     }
 
-    public void setYPosition(float yPos){
+    public void setY(float yPos){
         this.yPos = yPos;
     }
 
@@ -56,6 +56,16 @@ public class Present {
 
     public float getY(){
         return yPos;
+    }
+
+    @Override
+    public float getHeight() {
+        return currentAnimation.getHeight();
+    }
+
+    @Override
+    public float getWidth() {
+        return currentAnimation.getWidth();
     }
 
     public void playVisibleAnimation(){

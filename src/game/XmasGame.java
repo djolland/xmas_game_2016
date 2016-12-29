@@ -20,15 +20,12 @@ import static java.lang.Math.abs;
 public class XmasGame extends BasicGame {
 
     private TiledMap xmasMap;
-    private Animation upPlayer, downPlayer, leftPlayer, rightPlayer;
-    private Animation upCat, downCat, leftCat, rightCat;
     private Present xmasPresent;
     private ArrayList<ChasingCat> catSwarm;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
     private boolean[][] blocked, playerSpawn, catSpawn, goalBlock;
     private static final int SIZE = 64; // Tile size
     private int playerScore;
-    private Sound angryCatSound;
     private PlayerCharacter playerCharacter;
 
     public XmasGame() {
@@ -48,21 +45,19 @@ public class XmasGame extends BasicGame {
 
     @Override
     public void init(GameContainer container) throws SlickException {
+        Animation upPlayer, downPlayer, leftPlayer, rightPlayer;
+        Animation upCat, downCat, leftCat, rightCat;
+
+        // Initializing score
         playerScore = 0;
 
         // Defining game map asset
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
         //xmasMap = new TiledMap("assets/maps/xmas_house_map_64x64.tmx");
 
-        // Defining sounds
-        angryCatSound = new Sound("assets/sounds/cat_death_sound.wav");
-
         /* defining other objects */
-        Animation visibleAnimation =
-                new Animation(
-                new Image[]{new Image("assets/other/xmas_present.png")},
-                100,
-                false);
+        Animation visibleAnimation = new Animation(
+                new Image[]{new Image("assets/other/xmas_present.png")}, 100, false);
         xmasPresent = new Present(visibleAnimation, visibleAnimation);
 
         /* Defining player animations */
@@ -144,7 +139,7 @@ public class XmasGame extends BasicGame {
                             new Image("assets/other/explosion_raw_10.png")
                     },
                     new int[] {150  ,100,100,100,100,100,100,100,100,100}, false
-            ), angryCatSound));
+            ), new Sound("assets/sounds/cat_death_sound.wav"), playerCharacter));
         }
 
         // building collision and game maps based on tile properties in the TileD map
@@ -188,12 +183,11 @@ public class XmasGame extends BasicGame {
 
         /* dealing with the presents */
 
-        if ((playerCharacter.getX() + 33 > xmasPresent.getX() && playerCharacter.getX() - 30 < xmasPresent.getX()) &&
-                (playerCharacter.getY() + SIZE > xmasPresent.getY() && playerCharacter.getY() - 30 < xmasPresent.getY())){
+        if (playerCharacter.isColliding(xmasPresent)) {
             xmasPresent.setInvisible();
             playerScore += 1;
         }
-        if (!xmasPresent.isVisible()){
+        if (!xmasPresent.isVisible()) {
             spawnPresent();
         }
 
@@ -206,22 +200,19 @@ public class XmasGame extends BasicGame {
                 // The lower the delta the slowest the sprite will animate.
                 playerCharacter.setY(playerCharacter.getY() - delta * playerSpeed);
             }
-        }
-        else if (input.isKeyDown(Input.KEY_DOWN)) {
+        } else if (input.isKeyDown(Input.KEY_DOWN)) {
             playerCharacter.setAnimation(Character.AnimationDirection.DOWN);
-            if (!isBlocked(playerCharacter.getX(), playerCharacter.getY()+ SIZE + delta * playerSpeed)) {
+            if (!isBlocked(playerCharacter.getX(), playerCharacter.getY() + SIZE + delta * playerSpeed)) {
                 playerCharacter.update(delta);
                 playerCharacter.setY(playerCharacter.getY() + delta * playerSpeed);
             }
-        }
-        else if (input.isKeyDown(Input.KEY_LEFT)) {
+        } else if (input.isKeyDown(Input.KEY_LEFT)) {
             playerCharacter.setAnimation(Character.AnimationDirection.LEFT);
             if (!isBlocked(playerCharacter.getX() - delta * playerSpeed, playerCharacter.getY())) {
                 playerCharacter.update(delta);
                 playerCharacter.setX(playerCharacter.getX() - delta * playerSpeed);
             }
-        }
-        else if (input.isKeyDown(Input.KEY_RIGHT)) {
+        } else if (input.isKeyDown(Input.KEY_RIGHT)) {
             playerCharacter.setAnimation(Character.AnimationDirection.RIGHT);
             if (!isBlocked(playerCharacter.getX() + SIZE + delta * playerSpeed, playerCharacter.getY())) {
                 playerCharacter.update(delta);
@@ -230,7 +221,7 @@ public class XmasGame extends BasicGame {
         }
 
         /* Updating CAT SWARM */
-        for (ChasingCat cat : catSwarm){
+        for (ChasingCat cat : catSwarm) {
             cat.setTargetPosition(playerCharacter.getX(), playerCharacter.getY());
             if (cat.isAlive()) {
                 cat.update(delta);
@@ -241,7 +232,6 @@ public class XmasGame extends BasicGame {
                 }
             }
         }
-
     }
 
     public void render(GameContainer container, Graphics g) throws SlickException {
@@ -301,7 +291,7 @@ public class XmasGame extends BasicGame {
                 if (catSpawn[xAxis][yAxis]) {
                     if (!catSwarm.get(catCount).isAlive()) {
                         catSwarm.get(catCount).setAlive();
-                        catSwarm.get(catCount).setPosition((xAxis) * 64 + 32, (yAxis) * 64 + 32);
+                        catSwarm.get(catCount).setPosition((xAxis) * SIZE + 32, (yAxis) * SIZE + 32);
                         catCount --;
                     }
                 }
@@ -309,5 +299,4 @@ public class XmasGame extends BasicGame {
         }
 
     }
-
 }

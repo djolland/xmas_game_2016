@@ -15,10 +15,12 @@ public class ChasingCat extends Character{
     private boolean isAlive;
     private boolean isDying;
     private Animation dyingAnim;
+    private GameObject targetObject;
     private float targetX, targetY, catSpeed;
     private Sound deathSound;
 
-    public ChasingCat(Animation up, Animation down, Animation left, Animation right, Animation dyingAnim, Sound deathSound) {
+    public ChasingCat(Animation up, Animation down, Animation left, Animation right, Animation dyingAnim, Sound deathSound,
+                      GameObject targetObject) {
         super(up, down, left, right);
         this.dyingAnim = dyingAnim;
         this.dyingAnim.setLooping(false);
@@ -26,6 +28,7 @@ public class ChasingCat extends Character{
         this.isAlive = false;
         this.isDying = false;
         this.catSpeed = 0.1f;
+        this.targetObject = targetObject;
 
     }
 
@@ -69,11 +72,9 @@ public class ChasingCat extends Character{
             this.dyingAnim.restart();
         }
         else {
-            super.update(delta);
             /* Defining Cat Motion - Follows after target*/
             // If cat has reached its target... kill it!
-            if ((targetX + 64 > this.getX() && targetX - 1 < this.getX()) &&
-                    (targetY + 64 > this.getY() && targetY - 1 < this.getY())) {
+            if (this.isColliding(targetObject)) {
                 this.kill();
                 deathSound.play();
             } else {
@@ -115,6 +116,7 @@ public class ChasingCat extends Character{
                     }
                 }
             }
+            super.update(delta);
         }
     }
 }
