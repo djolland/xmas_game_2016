@@ -65,12 +65,16 @@ public class ChasingCat extends Character{
     @Override
     public void update(int delta) {
         // If the cat is done dying reset the death animation and make it not alive
-        if (this.isDying() && this.getCurrentAnimation().isStopped()) {
+        if (this.isDying() && this.getCurrentAnimation() == dyingAnim && this.getCurrentAnimation().isStopped()) {
             isDying = false;
             isAlive = false;
             this.dyingAnim.restart();
         }
+        else if (this.isDying){
+            super.update(delta);
+        }
         else {
+            super.update(delta);
             /* Defining Cat Motion - Follows after target*/
             // If cat has reached its target... kill it!
             if (this.isColliding(targetObject)) {
@@ -79,15 +83,17 @@ public class ChasingCat extends Character{
             } else {
                 // When traveling diagonally maintain last animation direction
                 if (abs(targetObject.getX() - this.getX()) + 1 > abs(targetObject.getY() - this.getY()) &&
-                        abs(targetObject.getX() - this.getX()) - 1 < abs(targetObject.getY() - this.getY())) {
-                    if (abs(targetObject.getX() - this.getX()) > abs(targetObject.getY() - this.getY())) {
-                        if (targetObject.getX() >= this.getX()) {
+                    abs(targetObject.getX() - this.getX()) - 1 < abs(targetObject.getY() - this.getY()))
+                {
+                    if (abs(targetObject.getX() - this.getX()) > abs(targetObject.getY() - this.getY()))
+                    {
+                        if (targetObject.getX() > this.getX()) {
                             this.setX(this.getX() + delta * catSpeed);
                         } else {
                             this.setX(this.getX() - delta * catSpeed);
                         }
                     } else {
-                        if (targetY >= this.getY()) {
+                        if (targetY > this.getY()) {
                             this.setY(this.getY() + delta * catSpeed);
                         } else {
                             this.setY(this.getY() - delta * catSpeed);
@@ -105,7 +111,7 @@ public class ChasingCat extends Character{
                     }
                 }
                 // Up down travel
-                else {//if (abs(targetX-cat.getX()) < abs(targetY-yCat)) {
+                else {
                     if (targetObject.getY() > this.getY() + 1) {
                         this.setAnimation(Character.AnimationDirection.DOWN);
                         this.setY(this.getY() + delta * catSpeed);
@@ -115,7 +121,6 @@ public class ChasingCat extends Character{
                     }
                 }
             }
-            super.update(delta);
         }
     }
 }

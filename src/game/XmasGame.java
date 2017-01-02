@@ -118,7 +118,7 @@ public class XmasGame extends BasicGame {
 
         // Generating cat swarm
         catSwarm = new ArrayList<>();
-        int totalCats = 10; // Total number of cats on screen a the same time
+        int totalCats = 1; // Total number of cats on screen a the same time
         for (int i = 0; i < totalCats; i++){
             catSwarm.add(new ChasingCat(new Animation(movementUpCat, durationCat, false),
                                         new Animation(movementDownCat, durationCat, false),
@@ -225,6 +225,7 @@ public class XmasGame extends BasicGame {
 
         /* Updating CAT SWARM */
         for (ChasingCat cat : catSwarm) {
+            cat.setTargetPosition(playerCharacter.getX(), playerCharacter.getY());
             if (cat.isAlive()) {
                 cat.update(delta);
                 if (!cat.isAlive()) {

@@ -32,13 +32,13 @@ public class Character extends GameObject{
         characterSprite = animation;
     }
 
-    public void setPosition(float xpos, float yPos){
-        this.xPos = xpos;
+    public void setPosition(float xPos, float yPos){
+        this.xPos = xPos;
         this.yPos = yPos;
     }
 
-    public void setX(float xpos){
-        this.xPos = xpos;
+    public void setX(float xPos){
+        this.xPos = xPos;
     }
 
     public void setY(float yPos){
