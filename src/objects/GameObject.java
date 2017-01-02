@@ -18,10 +18,9 @@ public abstract class GameObject {
     public abstract void setPosition(float xPos, float yPos);
 
     public boolean isColliding(GameObject other){
-        return (((this.getX() >= other.getX() && this.getX() <= other.getX() + other.getWidth()) ||
-                (this.getX() + this.getWidth() >= other.getX() && this.getX() + this.getWidth() <= other.getX() + other.getWidth())) &&
-                ((this.getY() >= other.getY() && this.getY() <= other.getY() + other.getHeight()) ||
-                (this.getY() + this.getHeight() >= other.getY() && this.getY() + this.getHeight() <= other.getY() + other.getHeight())));
+        return (this.getX() < other.getX() + other.getWidth() && this.getX() + this.getWidth() > other.getX() &&
+                this.getY() < other.getY() + other.getHeight() && this.getY() + this.getHeight() > other.getY());
+
     }
 
 }

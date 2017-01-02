@@ -80,4 +80,8 @@ public class Present extends GameObject{
         currentAnimation.draw(xPos, yPos);
     }
 
+    public void update(int delta){
+        currentAnimation.update(delta);
+    }
+
 }
