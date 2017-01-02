@@ -15,9 +15,9 @@ public class ChasingCat extends Character{
     private boolean isAlive;
     private boolean isDying;
     private Animation dyingAnim;
-    private GameObject targetObject;
-    private float targetX, targetY, catSpeed;
     private Sound deathSound;
+    private float catSpeed;
+    private GameObject targetObject;
 
     public ChasingCat(Animation up, Animation down, Animation left, Animation right, Animation dyingAnim, Sound deathSound,
                       GameObject targetObject) {
@@ -49,17 +49,8 @@ public class ChasingCat extends Character{
         isAlive = true;
     }
 
-    public void setTargetPosition(float xPos, float yPos){
-        targetX = xPos;
-        targetY = yPos;
-    }
-
-    public void setTargetX(float xPos){
-        targetX = xPos;
-    }
-
-    public void setTargetY(float yPos){
-        targetY = yPos;
+    public void setTargetObject(GameObject targetObject){
+        this.targetObject = targetObject;
     }
 
     @Override
@@ -93,7 +84,7 @@ public class ChasingCat extends Character{
                             this.setX(this.getX() - delta * catSpeed);
                         }
                     } else {
-                        if (targetY > this.getY()) {
+                        if (targetObject.getY() > this.getY()) {
                             this.setY(this.getY() + delta * catSpeed);
                         } else {
                             this.setY(this.getY() - delta * catSpeed);
@@ -103,20 +94,20 @@ public class ChasingCat extends Character{
                 // Left right travel
                 else if (abs(targetObject.getX() - this.getX()) > abs(targetObject.getY() - this.getY())) {
                     if (targetObject.getX() > this.getX() + 1) {
-                        this.setAnimation(Character.AnimationDirection.RIGHT);
+                        this.setAnimation(AnimationDirection.RIGHT);
                         this.setX(this.getX() + delta * catSpeed);
                     } else {
-                        this.setAnimation(Character.AnimationDirection.LEFT);
+                        this.setAnimation(AnimationDirection.LEFT);
                         this.setX(this.getX() - delta * catSpeed);
                     }
                 }
                 // Up down travel
                 else {
                     if (targetObject.getY() > this.getY() + 1) {
-                        this.setAnimation(Character.AnimationDirection.DOWN);
+                        this.setAnimation(AnimationDirection.DOWN);
                         this.setY(this.getY() + delta * catSpeed);
                     } else {
-                        this.setAnimation(Character.AnimationDirection.UP);
+                        this.setAnimation(AnimationDirection.UP);
                         this.setY(this.getY() - delta * catSpeed);
                     }
                 }
