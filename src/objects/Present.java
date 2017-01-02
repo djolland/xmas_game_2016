@@ -25,14 +25,19 @@ public class Present extends GameObject{
 
     }
 
+    // Setters
+
+    @Override
     public void setX(float xPos){
         this.xPos = xPos;
     }
 
+    @Override
     public void setY(float yPos){
         this.yPos = yPos;
     }
 
+    @Override
     public void setPosition(float xPos, float yPos){
         this.xPos = xPos;
         this.yPos = yPos;
@@ -46,14 +51,14 @@ public class Present extends GameObject{
         isVisible = false;
     }
 
-    public boolean isVisible(){
-        return isVisible;
-    }
+    // Getters
 
+    @Override
     public float getX(){
         return xPos;
     }
 
+    @Override
     public float getY(){
         return yPos;
     }
@@ -66,6 +71,10 @@ public class Present extends GameObject{
     @Override
     public float getWidth() {
         return currentAnimation.getWidth();
+    }
+
+    public boolean isVisible(){
+        return isVisible;
     }
 
     public void playVisibleAnimation(){

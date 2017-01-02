@@ -45,15 +45,11 @@ public class XmasGame extends BasicGame {
 
     @Override
     public void init(GameContainer container) throws SlickException {
-        Animation upPlayer, downPlayer, leftPlayer, rightPlayer;
-        Animation upCat, downCat, leftCat, rightCat;
-
         // Initializing score
         playerScore = 0;
 
         // Defining game map asset
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
-        //xmasMap = new TiledMap("assets/maps/xmas_house_map_64x64.tmx");
 
         // building collision and game maps based on tile properties in the TileD map
         blocked = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
