@@ -20,8 +20,7 @@ import static java.lang.Math.abs;
 public class XmasGame extends BasicGame {
 
     private TiledMap xmasMap;
-    private Animation upPlayer, downPlayer, leftPlayer, rightPlayer;
-    private Animation upCat, downCat, leftCat, rightCat;
+
     private Present xmasPresent;
     private ArrayList<ChasingCat> catSwarm;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
@@ -85,20 +84,17 @@ public class XmasGame extends BasicGame {
                 new Image("assets/characters/nerd_player/nerd_right_3.png")};
         int [] duration = {100, 100, 100, 100};
 
-
-        upPlayer = new Animation(movementUp, duration, false);
-        downPlayer = new Animation(movementDown, duration, false);
-        leftPlayer = new Animation(movementLeft, duration, false);
-        rightPlayer = new Animation(movementRight, duration, false);
-
-        playerCharacter = new PlayerCharacter(upPlayer, downPlayer, leftPlayer, rightPlayer);
+        playerCharacter = new PlayerCharacter(new Animation(movementUp, duration, false),
+                                              new Animation(movementDown, duration, false),
+                                              new Animation(movementLeft, duration, false),
+                                              new Animation(movementRight, duration, false));
 
         // Setting initial player position to right
         playerCharacter.setAnimation(Character.AnimationDirection.DOWN);
 
         //Initializing player location
+        // TODO: replace this with spawnPlayer map logic
         playerCharacter.setPosition(128f, 128f);
-        //replace above with spawnPlayer logic here
 
         /* Defining Cat Animations */
         Image[] movementUpCat = {
@@ -119,29 +115,29 @@ public class XmasGame extends BasicGame {
                 new Image("assets/characters/zelda/zelda_right_3.png")};
         int [] durationCat = {100, 100, 100};
 
-        upCat = new Animation(movementUpCat, durationCat, false);
-        downCat = new Animation(movementDownCat, durationCat, false);
-        leftCat = new Animation(movementLeftCat, durationCat, false);
-        rightCat= new Animation(movementRightCat, durationCat, false);
         // Generating cat swarm
         catSwarm = new ArrayList<>();
         int totalCats = 10; // Total number of cats on screen a the same time
         for (int i = 0; i < totalCats; i++){
-            catSwarm.add(new ChasingCat(upCat, downCat, leftCat, rightCat, new Animation(
-                    new Image[]{
-                            new Image("assets/other/explosion_raw_1.png"),
-                            new Image("assets/other/explosion_raw_2.png"),
-                            new Image("assets/other/explosion_raw_3.png"),
-                            new Image("assets/other/explosion_raw_4.png"),
-                            new Image("assets/other/explosion_raw_5.png"),
-                            new Image("assets/other/explosion_raw_6.png"),
-                            new Image("assets/other/explosion_raw_7.png"),
-                            new Image("assets/other/explosion_raw_8.png"),
-                            new Image("assets/other/explosion_raw_9.png"),
-                            new Image("assets/other/explosion_raw_10.png")
-                    },
-                    new int[] {150  ,100,100,100,100,100,100,100,100,100}, false
-            )));
+            catSwarm.add(new ChasingCat(new Animation(movementUpCat, durationCat, false),
+                                        new Animation(movementDownCat, durationCat, false),
+                                        new Animation(movementLeftCat, durationCat, false),
+                                        new Animation(movementRightCat, durationCat, false),
+                                        new Animation(new Image[]{new Image("assets/other/explosion_raw_1.png"),
+                                                                  new Image("assets/other/explosion_raw_2.png"),
+                                                                  new Image("assets/other/explosion_raw_3.png"),
+                                                                  new Image("assets/other/explosion_raw_4.png"),
+                                                                  new Image("assets/other/explosion_raw_5.png"),
+                                                                  new Image("assets/other/explosion_raw_6.png"),
+                                                                  new Image("assets/other/explosion_raw_7.png"),
+                                                                  new Image("assets/other/explosion_raw_8.png"),
+                                                                  new Image("assets/other/explosion_raw_9.png"),
+                                                                  new Image("assets/other/explosion_raw_10.png")
+                                                                  },
+                                                     new int[] {150  ,100,100,100,100,100,100,100,100,100}, false
+                                                     )
+                                        )
+                        );
         }
 
         // building collision and game maps based on tile properties in the TileD map
@@ -295,7 +291,7 @@ public class XmasGame extends BasicGame {
                 if (catSpawn[xAxis][yAxis]) {
                     if (!catSwarm.get(catCount).isAlive()) {
                         catSwarm.get(catCount).setAlive();
-                        catSwarm.get(catCount).setPosition((xAxis) * 64 + 32, (yAxis) * 64 + 32);
+                        catSwarm.get(catCount).setPosition((xAxis) * SIZE + 32, (yAxis) * SIZE + 32);
                         catCount --;
                     }
                 }

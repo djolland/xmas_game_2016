@@ -1,15 +1,11 @@
 package objects;
 
-import java.awt.geom.Rectangle2D;
-
 /**
  * @author Daniel J. Holland
  * @version 1.0
  * Created on 12/28/2016.
  */
 public abstract class GameObject {
-
-    private Rectangle2D rect;
 
     // Getters
     public abstract float getX();
