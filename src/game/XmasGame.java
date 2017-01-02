@@ -195,12 +195,12 @@ public class XmasGame extends BasicGame {
         /* Updating CAT SWARM */
         for (ChasingCat cat : catSwarm) {
             if (cat.isAlive()) {
-                cat.update(delta);
-                if (cat.isColliding(playerCharacter)) {
+                if (cat.isColliding(playerCharacter) && !cat.isDying()) {
                     if (playerScore > 0) {
                         playerScore--;
                     }
                 }
+                cat.update(delta);
             }
         }
 
