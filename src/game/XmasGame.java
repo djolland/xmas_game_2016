@@ -19,8 +19,8 @@ public class XmasGame extends BasicGame {
     private Present xmasPresent;
     private ArrayList<ChasingCat> catSwarm;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
-    private boolean[][] blocked, playerSpawn, catSpawn, goalBlock;
-    private GameTileMap gametiles;
+    private boolean[][] goalBlock;
+    private GameTileMap gameTiles;
     private static final int SIZE = 64; // Tile size
     private int playerScore;
     private PlayerCharacter playerCharacter;
@@ -55,10 +55,7 @@ public class XmasGame extends BasicGame {
         mainMusic.loop();
 
         // building collision and game maps based on tile properties in the TileD map
-        gametiles = new GameTileMap(xmasMap.getWidth(), xmasMap.getHeight(), SIZE, SIZE);
-        blocked = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
-        catSpawn = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
-        playerSpawn = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
+        gameTiles = new GameTileMap(xmasMap.getWidth(), xmasMap.getHeight(), SIZE, SIZE);
         goalBlock = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
         for (int xAxis=0; xAxis < xmasMap.getWidth(); xAxis++) {
             for (int yAxis=0; yAxis < xmasMap.getHeight(); yAxis++) {
@@ -67,14 +64,12 @@ public class XmasGame extends BasicGame {
                 // Building map of player spawn points... TODO: Implement player spawn map
                 String value = xmasMap.getTileProperty(tileID, "playerSpawn", "false");
                 if ("true".equals(value)) {
-                    playerSpawn[xAxis][yAxis] = true;
-                    gametiles.getTile(xAxis, yAxis).setPlayerSpawn(true);
+                    gameTiles.getTile(xAxis, yAxis).setPlayerSpawn(true);
                 }
                 // Building map of cat spawn points.
                 value = xmasMap.getTileProperty(tileID, "catSpawn", "false");
                 if ("true".equals(value)) {
-                    catSpawn[xAxis][yAxis] = true;
-                    gametiles.getTile(xAxis, yAxis).setCatSpawn(true);
+                    gameTiles.getTile(xAxis, yAxis).setCatSpawn(true);
                 }
                 // Building goal map.... TODO: Implement goal map.
                 value = xmasMap.getTileProperty(tileID, "goal", "false");
@@ -86,8 +81,7 @@ public class XmasGame extends BasicGame {
                     tileID = xmasMap.getTileId(xAxis, yAxis, layer.getValue());
                     value = xmasMap.getTileProperty(tileID, "blocked", "false");
                     if ("true".equals(value)) {
-                        blocked[xAxis][yAxis] = true;
-                        gametiles.getTile(xAxis, yAxis).setBlocked(true);
+                        gameTiles.getTile(xAxis, yAxis).setBlocked(true);
                     }
                 }
             }
@@ -123,7 +117,7 @@ public class XmasGame extends BasicGame {
                                               new Animation(movementDown, duration, false),
                                               new Animation(movementLeft, duration, false),
                                               new Animation(movementRight, duration, false),
-                                              container.getInput(), blocked);
+                                              container.getInput(), gameTiles);
 
         // Setting initial player position to right
         playerCharacter.setAnimation(Character.AnimationDirection.DOWN);
@@ -197,7 +191,7 @@ public class XmasGame extends BasicGame {
 
         int xPos = rand.nextInt(xmasMap.getWidth());
         int yPos = rand.nextInt(xmasMap.getHeight());
-        while (blocked[xPos][yPos]){
+        while (gameTiles.getTile(xPos, yPos).isBlocked()){
             xPos = rand.nextInt(xmasMap.getWidth());
             yPos = rand.nextInt(xmasMap.getHeight());
         }
@@ -213,15 +207,15 @@ public class XmasGame extends BasicGame {
                 catCount ++;
             }
         }
-        for (int xAxis = 0; xAxis < catSpawn[0].length ; xAxis++) {
+        for (int xAxis = 0; xAxis < gameTiles.getWidth(); xAxis++) {
             if (catCount < 0){
                 break;
             }
-            for (int yAxis = 0; yAxis < catSpawn.length; yAxis++) {
+            for (int yAxis = 0; yAxis < gameTiles.getHeight(); yAxis++) {
                 if (catCount < 0){
                     break;
                 }
-                if (catSpawn[xAxis][yAxis]) {
+                if (gameTiles.getTile(xAxis, yAxis).isCatSpawn()) {
                     if (!catSwarm.get(catCount).isAlive()) {
                         catSwarm.get(catCount).setAlive();
                         catHissSound.play();

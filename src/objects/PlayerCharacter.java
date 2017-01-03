@@ -1,5 +1,6 @@
 package objects;
 
+import game.GameTileMap;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Input;
 
@@ -11,14 +12,14 @@ import org.newdawn.slick.Input;
 public class PlayerCharacter extends Character{
 
     private Input input;
-    private boolean[][] blocked;
+    private GameTileMap gameTiles;
     private float playerSpeed;
 
     public PlayerCharacter(Animation up, Animation down, Animation left, Animation right,
-                           Input input, boolean[][] blocked) {
+                           Input input, GameTileMap gameTiles) {
         super(up, down, left, right);
         this.input = input;
-        this.blocked = blocked;
+        this.gameTiles = gameTiles;
         this.playerSpeed = 0.3f; // Higher values = faster player speed
     }
 
@@ -33,7 +34,6 @@ public class PlayerCharacter extends Character{
             this.setAnimation(Character.AnimationDirection.UP);
             if (!isBlocked(this.getX(), this.getY() - delta * playerSpeed)) {
                 super.update(delta);
-                // The lower the delta the slowest the sprite will animate.
                 this.setY(this.getY() - delta * playerSpeed);
             }
         }
@@ -63,7 +63,7 @@ public class PlayerCharacter extends Character{
     private boolean isBlocked(float x, float y) {
         int xBlock = (int)x / 64;
         int yBlock = (int)y / 64;
-        return blocked[xBlock][yBlock];
+        return gameTiles.getTile(xBlock, yBlock).isBlocked();
     }
 
 }
