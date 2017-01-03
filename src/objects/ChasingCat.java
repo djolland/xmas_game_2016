@@ -14,6 +14,8 @@ public class ChasingCat extends ChasingCharacter{
 
     private final static int [] durationCat = {100, 100, 100};
     private final static int [] dyingDuration = {150,100,100,100,100,100,100,100,100,100};
+    private final static float timeLimitS = 10;
+    private float timer;
 
     public ChasingCat(GameObject targetObject) throws SlickException {
         super(new Animation(new Image[] {
@@ -50,5 +52,22 @@ public class ChasingCat extends ChasingCharacter{
                         dyingDuration, false),
                 new Sound("assets/sounds/small_explosion_01.wav"), 0.1f, targetObject
         );
+        this.timer = 0;
+    }
+
+    @Override
+    public void kill(){
+        super.kill();
+        timer = 0;
+    }
+
+    @Override
+    public void update(int delta) {
+        timer += delta / 1000f;
+        if (timer >= timeLimitS){
+            this.kill();
+        }
+        super.update(delta);
+
     }
 }

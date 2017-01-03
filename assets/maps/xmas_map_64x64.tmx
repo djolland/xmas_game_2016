@@ -74,7 +74,7 @@
  </layer>
  <layer name="game" width="10" height="10">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC2NgoD4QRmILQjE2OWQgBMWEzCNFjhw9lJgnTECMGAAA3Nr3D5ABAAA=
+   H4sIAAAAAAAAC2NgIB4IkiEnSEAfMUCYSDlkthAUE2MGpQDZf8JodpHqdwCqyqLjkAEAAA==
   </data>
  </layer>
 </map>

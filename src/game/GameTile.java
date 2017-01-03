@@ -11,7 +11,7 @@ public class GameTile extends GameObject {
 
     private int xPos, yPos;
     private float tileHeight, tileWidth;
-    private boolean isBlocked, isCatSpawn, isPlayerSpawn;
+    private boolean isBlocked, isCatSpawn, isPlayerSpawn, isTarget;
 
     public GameTile(int xPos, int yPos, float tileHeight, float tileWidth){
         this.xPos = xPos;
@@ -21,6 +21,7 @@ public class GameTile extends GameObject {
         this.isBlocked = false;
         this.isCatSpawn = false;
         this.isPlayerSpawn = false;
+        this.isTarget = false;
     }
 
     public GameTile(int xPos, int yPos, float tileHeight, float tileWidth, boolean isBlocked){
@@ -31,24 +32,19 @@ public class GameTile extends GameObject {
         this.isBlocked = isBlocked;
         this.isCatSpawn = false;
         this.isPlayerSpawn = false;
+        this.isTarget = false;
     }
 
     // Getters
 
     @Override
-    public float getX(){
-        return xPos;
-    }
+    public float getX(){return xPos * tileWidth;}
 
     @Override
-    public float getY(){
-        return yPos;
-    }
+    public float getY(){return yPos * tileHeight;}
 
     @Override
-    public float getHeight(){
-        return tileHeight;
-    }
+    public float getHeight(){return tileHeight;}
 
     @Override
     public float getWidth(){return tileWidth;}
@@ -59,22 +55,20 @@ public class GameTile extends GameObject {
 
     public boolean isPlayerSpawn(){return isPlayerSpawn;}
 
+    public boolean isTarget(){return isTarget;}
+
     // Setters
 
     @Override
-    public void setX(float xPos){
-        this.xPos = (int)(xPos % tileWidth);
-    }
+    public void setX(float xPos){this.xPos = (int)(xPos / tileWidth);}
 
     @Override
-    public void setY(float yPos){
-        this.yPos = (int)(yPos % tileHeight);
-    }
+    public void setY(float yPos){this.yPos = (int)(yPos / tileHeight);}
 
     @Override
     public void setPosition(float xPos, float yPos) {
-        this.xPos = (int)(xPos % tileWidth);
-        this.yPos = (int)(yPos % tileHeight);
+        this.xPos = (int)(xPos / tileWidth);
+        this.yPos = (int)(yPos / tileHeight);
     }
 
     public void setBlocked(boolean blocked){this.isBlocked = blocked;}
@@ -82,4 +76,7 @@ public class GameTile extends GameObject {
     public void setCatSpawn(boolean catSpawn){this.isCatSpawn = catSpawn;}
 
     public void setPlayerSpawn(boolean playerSpawn){this.isPlayerSpawn = playerSpawn;}
+
+    public void setTarget(boolean target){this.isTarget = target;}
+
 }

@@ -20,6 +20,7 @@ public class XmasGame extends BasicGame {
     private ArrayList<ChasingCat> catSwarm;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
     private boolean[][] goalBlock;
+    private ArrayList<GameObject> targetList;
     private GameTileMap gameTiles;
     private static final int SIZE = 64; // Tile size
     private int playerScore;
@@ -55,8 +56,8 @@ public class XmasGame extends BasicGame {
         mainMusic.loop();
 
         // building collision and game maps based on tile properties in the TileD map
+        targetList = new ArrayList<>();
         gameTiles = new GameTileMap(xmasMap.getWidth(), xmasMap.getHeight(), SIZE, SIZE);
-        goalBlock = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
         for (int xAxis=0; xAxis < xmasMap.getWidth(); xAxis++) {
             for (int yAxis=0; yAxis < xmasMap.getHeight(); yAxis++) {
                 // Getting spawn points and goal blocks
@@ -74,7 +75,8 @@ public class XmasGame extends BasicGame {
                 // Building goal map.... TODO: Implement goal map.
                 value = xmasMap.getTileProperty(tileID, "goal", "false");
                 if ("true".equals(value)) {
-                    goalBlock[xAxis][yAxis] = true;
+                    gameTiles.getTile(xAxis, yAxis).setTarget(true);
+                    targetList.add(gameTiles.getTile(xAxis,yAxis));
                 }
                 // Building collision map
                 for (MapLayers layer : MapLayers.values()){
@@ -126,9 +128,11 @@ public class XmasGame extends BasicGame {
         // TODO: replace this with spawnPlayer map logic
         playerCharacter.setPosition((xmasMap.getWidth()/2) * SIZE, (xmasMap.getHeight()/2) * SIZE);
 
+        targetList.add(playerCharacter);
+
         // Generating cat swarm
         catSwarm = new ArrayList<>();
-        int totalCats = 10; // Total number of cats on screen a the same time
+        int totalCats = 5; // Total number of cats on screen a the same time
         for (int i = 0; i < totalCats; i++){
             catSwarm.add(new ChasingCat(playerCharacter));
         }
@@ -157,9 +161,9 @@ public class XmasGame extends BasicGame {
         for (ChasingCat cat : catSwarm) {
             if (cat.isAlive()) {
                 if (cat.isColliding(playerCharacter) && !cat.isDying()) {
+                    cat.kill();
                     if (playerScore > 0) {
                         playerScore--;
-                        //catHissSound.play();
                     }
                 }
                 cat.update(delta);
@@ -201,30 +205,23 @@ public class XmasGame extends BasicGame {
 
     private void spawnCats(){
         // Spawning Cats
-        int catCount =  -1;
+        Random rand = new Random();
+        boolean[][] spawnedList = new boolean[gameTiles.getWidth()][gameTiles.getHeight()];
         for (ChasingCat cat : catSwarm){
-            if (!cat.isAlive()){
-                catCount ++;
+            int xPos = rand.nextInt(gameTiles.getWidth() - 1);
+            int yPos = rand.nextInt(gameTiles.getHeight() - 1);
+            //generate random location until unused cat spawn location found
+            if (!cat.isAlive()) {
+                while (!gameTiles.getTile(xPos, yPos).isCatSpawn()){// && spawnedList[xPos][yPos]) {
+                    xPos = rand.nextInt(gameTiles.getWidth() - 1);
+                    yPos = rand.nextInt(gameTiles.getHeight() - 1);
+                }
+                cat.setPosition(xPos * SIZE + SIZE/2, yPos * SIZE + SIZE/2);
+                cat.setAlive();
+                cat.setTargetObject(targetList.get(rand.nextInt(targetList.size())));
+                catHissSound.play();
+                spawnedList[xPos][yPos] = true;
             }
         }
-        for (int xAxis = 0; xAxis < gameTiles.getWidth(); xAxis++) {
-            if (catCount < 0){
-                break;
-            }
-            for (int yAxis = 0; yAxis < gameTiles.getHeight(); yAxis++) {
-                if (catCount < 0){
-                    break;
-                }
-                if (gameTiles.getTile(xAxis, yAxis).isCatSpawn()) {
-                    if (!catSwarm.get(catCount).isAlive()) {
-                        catSwarm.get(catCount).setAlive();
-                        catHissSound.play();
-                        catSwarm.get(catCount).setPosition((xAxis) * SIZE + 32, (yAxis) * SIZE + 32);
-                        catCount --;
-                    }
-                }
-            }
-        }
-
     }
 }
