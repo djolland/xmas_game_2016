@@ -1,6 +1,8 @@
 package objects;
 
 import org.newdawn.slick.Animation;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 
 /**
@@ -19,12 +21,24 @@ public class Present extends GameObject{
     private float xPos;
     private float yPos;
 
-    public Present(Animation visibleAnimation, Animation collectedAnimation, Sound pickupSound){
-        this.visibleAnimation = visibleAnimation;
-        this.collectedAnimation = collectedAnimation;
+    public Present() throws SlickException {
+        this.visibleAnimation = new Animation(
+                new Image[]{new Image("assets/other/xmas_present.png")}, 100, false);
+        this.collectedAnimation = new Animation(
+                new Image[]{
+                        new Image("assets/other/xmas_present_disappear_01.png"),
+                        new Image("assets/other/xmas_present_disappear_02.png"),
+                        new Image("assets/other/xmas_present_disappear_03.png"),
+                        new Image("assets/other/xmas_present_disappear_04.png"),
+                        new Image("assets/other/xmas_present_disappear_05.png"),
+                        new Image("assets/other/xmas_present_disappear_06.png"),
+                        new Image("assets/other/xmas_present_disappear_07.png")
+                },
+                new int[] {80, 80, 80, 80, 80, 80, 80}, false
+        );
         this.collectedAnimation.setLooping(false);
         this.currentAnimation = this.visibleAnimation;
-        this.pickupSound = pickupSound;
+        this.pickupSound = new Sound("assets/sounds/pickup_01.wav");
         this.isVisible = false;
         this.isCollected = false;
     }

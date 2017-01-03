@@ -93,21 +93,7 @@ public class XmasGame extends BasicGame {
         }
 
         /* defining other objects */
-        Animation visibleAnimation = new Animation(
-                new Image[]{new Image("assets/other/xmas_present.png")}, 100, false);
-        Animation collectedAnimation = new Animation(
-                new Image[]{
-                        new Image("assets/other/xmas_present_disappear_01.png"),
-                        new Image("assets/other/xmas_present_disappear_02.png"),
-                        new Image("assets/other/xmas_present_disappear_03.png"),
-                        new Image("assets/other/xmas_present_disappear_04.png"),
-                        new Image("assets/other/xmas_present_disappear_05.png"),
-                        new Image("assets/other/xmas_present_disappear_06.png"),
-                        new Image("assets/other/xmas_present_disappear_07.png")
-                },
-                new int[] {80, 80, 80, 80, 80, 80, 80}, false
-        );
-        xmasPresent = new Present(visibleAnimation, collectedAnimation, new Sound("assets/sounds/pickup_01.wav"));
+        xmasPresent = new Present();
 
         /* Defining player animations */
         Image[] movementUp = {
@@ -145,49 +131,11 @@ public class XmasGame extends BasicGame {
         // TODO: replace this with spawnPlayer map logic
         playerCharacter.setPosition(128f, 128f);
 
-        /* Defining Cat Animations */
-        Image[] movementUpCat = {
-                new Image("assets/characters/zelda/zelda_up_1.png"),
-                new Image("assets/characters/zelda/zelda_up_2.png"),
-                new Image("assets/characters/zelda/zelda_up_3.png")};
-        Image [] movementDownCat = {
-                new Image("assets/characters/zelda/zelda_down_1.png"),
-                new Image("assets/characters/zelda/zelda_down_2.png"),
-                new Image("assets/characters/zelda/zelda_down_3.png")};
-        Image [] movementLeftCat = {
-                new Image("assets/characters/zelda/zelda_left_1.png"),
-                new Image("assets/characters/zelda/zelda_left_2.png"),
-                new Image("assets/characters/zelda/zelda_left_3.png")};
-        Image [] movementRightCat = {
-                new Image("assets/characters/zelda/zelda_right_1.png"),
-                new Image("assets/characters/zelda/zelda_right_2.png"),
-                new Image("assets/characters/zelda/zelda_right_3.png")};
-        int [] durationCat = {100, 100, 100};
-
         // Generating cat swarm
         catSwarm = new ArrayList<>();
         int totalCats = 10; // Total number of cats on screen a the same time
         for (int i = 0; i < totalCats; i++){
-            catSwarm.add(new ChasingCat(new Animation(movementUpCat, durationCat, false),
-                                        new Animation(movementDownCat, durationCat, false),
-                                        new Animation(movementLeftCat, durationCat, false),
-                                        new Animation(movementRightCat, durationCat, false),
-                                        new Animation(new Image[]{new Image("assets/other/explosion_raw_1.png"),
-                                                                  new Image("assets/other/explosion_raw_2.png"),
-                                                                  new Image("assets/other/explosion_raw_3.png"),
-                                                                  new Image("assets/other/explosion_raw_4.png"),
-                                                                  new Image("assets/other/explosion_raw_5.png"),
-                                                                  new Image("assets/other/explosion_raw_6.png"),
-                                                                  new Image("assets/other/explosion_raw_7.png"),
-                                                                  new Image("assets/other/explosion_raw_8.png"),
-                                                                  new Image("assets/other/explosion_raw_9.png"),
-                                                                  new Image("assets/other/explosion_raw_10.png")
-                                                            },
-                                                      new int[] {150  ,100,100,100,100,100,100,100,100,100}, false
-                                        ),
-                                        new Sound("assets/sounds/small_explosion_01.wav"), playerCharacter
-                            )
-            );
+            catSwarm.add(new ChasingCat(playerCharacter));
         }
 
     }
