@@ -27,6 +27,7 @@ public class XmasGame extends BasicGame {
     private static final int SIZE = 64; // Tile size
     private int playerScore;
     private PlayerCharacter playerCharacter;
+    private Sound catHissSound;
 
     public XmasGame() {
         super("Xmas Game");
@@ -50,6 +51,11 @@ public class XmasGame extends BasicGame {
 
         // Defining game map asset
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
+
+        // Defining music and sounds
+        catHissSound = new Sound("assets/sounds/cat_death_sound.wav");
+        Music mainMusic = new Music("assets/sounds/gloria_song.wav");
+        mainMusic.loop();
 
         // building collision and game maps based on tile properties in the TileD map
         blocked = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
@@ -89,7 +95,19 @@ public class XmasGame extends BasicGame {
         /* defining other objects */
         Animation visibleAnimation = new Animation(
                 new Image[]{new Image("assets/other/xmas_present.png")}, 100, false);
-        xmasPresent = new Present(visibleAnimation, visibleAnimation);
+        Animation collectedAnimation = new Animation(
+                new Image[]{
+                        new Image("assets/other/xmas_present_disappear_01.png"),
+                        new Image("assets/other/xmas_present_disappear_02.png"),
+                        new Image("assets/other/xmas_present_disappear_03.png"),
+                        new Image("assets/other/xmas_present_disappear_04.png"),
+                        new Image("assets/other/xmas_present_disappear_05.png"),
+                        new Image("assets/other/xmas_present_disappear_06.png"),
+                        new Image("assets/other/xmas_present_disappear_07.png")
+                },
+                new int[] {80, 80, 80, 80, 80, 80, 80}, false
+        );
+        xmasPresent = new Present(visibleAnimation, collectedAnimation, new Sound("assets/sounds/pickup_01.wav"));
 
         /* Defining player animations */
         Image[] movementUp = {
@@ -167,7 +185,7 @@ public class XmasGame extends BasicGame {
                                                             },
                                                       new int[] {150  ,100,100,100,100,100,100,100,100,100}, false
                                         ),
-                                        new Sound("assets/sounds/cat_death_sound.wav"), playerCharacter
+                                        new Sound("assets/sounds/small_explosion_01.wav"), playerCharacter
                             )
             );
         }
@@ -181,8 +199,8 @@ public class XmasGame extends BasicGame {
 
         /* dealing with the presents */
         xmasPresent.update(delta);
-        if (playerCharacter.isColliding(xmasPresent)){
-            xmasPresent.setInvisible();
+        if (playerCharacter.isColliding(xmasPresent) && !xmasPresent.isCollected()){
+            xmasPresent.collected();
             playerScore += 1;
         }
         if (!xmasPresent.isVisible()) {
@@ -198,6 +216,7 @@ public class XmasGame extends BasicGame {
                 if (cat.isColliding(playerCharacter) && !cat.isDying()) {
                     if (playerScore > 0) {
                         playerScore--;
+                        //catHissSound.play();
                     }
                 }
                 cat.update(delta);
@@ -256,6 +275,7 @@ public class XmasGame extends BasicGame {
                 if (catSpawn[xAxis][yAxis]) {
                     if (!catSwarm.get(catCount).isAlive()) {
                         catSwarm.get(catCount).setAlive();
+                        catHissSound.play();
                         catSwarm.get(catCount).setPosition((xAxis) * SIZE + 32, (yAxis) * SIZE + 32);
                         catCount --;
                     }

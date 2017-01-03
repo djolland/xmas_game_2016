@@ -1,6 +1,7 @@
 package objects;
 
 import org.newdawn.slick.Animation;
+import org.newdawn.slick.Sound;
 
 /**
  * @author Daniel J. Holland
@@ -12,17 +13,20 @@ public class Present extends GameObject{
     private Animation currentAnimation;
     private Animation visibleAnimation;
     private Animation collectedAnimation;
-    private boolean isVisible;
+    private Sound pickupSound;
+    private boolean isVisible, isCollected;
 
     private float xPos;
     private float yPos;
 
-    public Present(Animation visibleAnimation, Animation collectedAnimation){
+    public Present(Animation visibleAnimation, Animation collectedAnimation, Sound pickupSound){
         this.visibleAnimation = visibleAnimation;
         this.collectedAnimation = collectedAnimation;
+        this.collectedAnimation.setLooping(false);
         this.currentAnimation = this.visibleAnimation;
+        this.pickupSound = pickupSound;
         this.isVisible = false;
-
+        this.isCollected = false;
     }
 
     // Setters
@@ -44,11 +48,15 @@ public class Present extends GameObject{
     }
 
     public void setVisible(){
-        isVisible = true;
+        this.isVisible = true;
+        this.isCollected = false;
+        this.currentAnimation = visibleAnimation;
     }
 
-    public void setInvisible(){
-        isVisible = false;
+    public void collected(){
+        isCollected = true;
+        pickupSound.play();
+        this.currentAnimation = collectedAnimation;
     }
 
     // Getters
@@ -73,8 +81,16 @@ public class Present extends GameObject{
         return currentAnimation.getWidth();
     }
 
+    public Animation getCurrentAnimation(){
+        return this.currentAnimation;
+    }
+
     public boolean isVisible(){
         return isVisible;
+    }
+
+    public boolean isCollected(){
+        return this.isCollected;
     }
 
     public void playVisibleAnimation(){
@@ -86,11 +102,22 @@ public class Present extends GameObject{
     }
 
     public void draw(){
-        currentAnimation.draw(xPos, yPos);
+        if (currentAnimation == collectedAnimation) {
+            currentAnimation.draw(xPos - 17.5f, yPos);
+        }
+        else {
+            currentAnimation.draw(xPos, yPos);
+        }
     }
 
     public void update(int delta){
-        currentAnimation.update(delta);
+        if (this.isCollected && this.getCurrentAnimation().isStopped()) {
+            isVisible = false;
+            this.collectedAnimation.restart();
+        }
+        else{
+            currentAnimation.update(delta);
+        }
     }
 
 }
