@@ -1,16 +1,12 @@
 package game;
 
+import objects.*;
 import objects.Character;
-import objects.ChasingCat;
-import objects.PlayerCharacter;
-import objects.Present;
 import org.newdawn.slick.*;
 import org.newdawn.slick.tiled.TiledMap;
 
 import java.util.ArrayList;
 import java.util.Random;
-
-import static java.lang.Math.abs;
 
 /**
  * @author Daniel J. Holland
@@ -24,6 +20,7 @@ public class XmasGame extends BasicGame {
     private ArrayList<ChasingCat> catSwarm;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
     private boolean[][] blocked, playerSpawn, catSpawn, goalBlock;
+    private GameTileMap gametiles;
     private static final int SIZE = 64; // Tile size
     private int playerScore;
     private PlayerCharacter playerCharacter;
@@ -58,6 +55,7 @@ public class XmasGame extends BasicGame {
         mainMusic.loop();
 
         // building collision and game maps based on tile properties in the TileD map
+        gametiles = new GameTileMap(xmasMap.getWidth(), xmasMap.getHeight(), SIZE, SIZE);
         blocked = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
         catSpawn = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
         playerSpawn = new boolean[xmasMap.getWidth()][xmasMap.getHeight()];
@@ -70,11 +68,13 @@ public class XmasGame extends BasicGame {
                 String value = xmasMap.getTileProperty(tileID, "playerSpawn", "false");
                 if ("true".equals(value)) {
                     playerSpawn[xAxis][yAxis] = true;
+                    gametiles.getTile(xAxis, yAxis).setPlayerSpawn(true);
                 }
                 // Building map of cat spawn points.
                 value = xmasMap.getTileProperty(tileID, "catSpawn", "false");
                 if ("true".equals(value)) {
                     catSpawn[xAxis][yAxis] = true;
+                    gametiles.getTile(xAxis, yAxis).setCatSpawn(true);
                 }
                 // Building goal map.... TODO: Implement goal map.
                 value = xmasMap.getTileProperty(tileID, "goal", "false");
@@ -87,6 +87,7 @@ public class XmasGame extends BasicGame {
                     value = xmasMap.getTileProperty(tileID, "blocked", "false");
                     if ("true".equals(value)) {
                         blocked[xAxis][yAxis] = true;
+                        gametiles.getTile(xAxis, yAxis).setBlocked(true);
                     }
                 }
             }
@@ -129,7 +130,7 @@ public class XmasGame extends BasicGame {
 
         //Initializing player location
         // TODO: replace this with spawnPlayer map logic
-        playerCharacter.setPosition(128f, 128f);
+        playerCharacter.setPosition((xmasMap.getWidth()/2) * SIZE, (xmasMap.getHeight()/2) * SIZE);
 
         // Generating cat swarm
         catSwarm = new ArrayList<>();

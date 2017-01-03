@@ -39,6 +39,10 @@ public class ChasingCharacter extends Character{
         return isDying;
     }
 
+    private float getTargetX(){return targetObject.getX() + (targetObject.getWidth()/2);}
+
+    private float getTargetY(){return targetObject.getY() + (targetObject.getHeight()/2);}
+
     public void kill(){
         isDying = true;
         this.setAnimation(dyingAnim);
@@ -77,18 +81,18 @@ public class ChasingCharacter extends Character{
                 deathSound.play();
             } else {
                 // When traveling diagonally maintain last animation direction
-                if (abs(targetObject.getX() - this.getX()) + 1 > abs(targetObject.getY() - this.getY()) &&
-                        abs(targetObject.getX() - this.getX()) - 1 < abs(targetObject.getY() - this.getY()))
+                if (abs(getTargetX() - this.getX()) + 1 > abs(getTargetY() - this.getY()) &&
+                        abs(getTargetX() - this.getX()) - 1 < abs(getTargetY() - this.getY()))
                 {
-                    if (abs(targetObject.getX() - this.getX()) > abs(targetObject.getY() - this.getY()))
+                    if (abs(getTargetX() - this.getX()) > abs(getTargetY() - this.getY()))
                     {
-                        if (targetObject.getX() > this.getX()) {
+                        if (getTargetX() > this.getX()) {
                             this.setX(this.getX() + delta * characterSpeed);
                         } else {
                             this.setX(this.getX() - delta * characterSpeed);
                         }
                     } else {
-                        if (targetObject.getY() > this.getY()) {
+                        if (getTargetY() > this.getY()) {
                             this.setY(this.getY() + delta * characterSpeed);
                         } else {
                             this.setY(this.getY() - delta * characterSpeed);
@@ -96,8 +100,8 @@ public class ChasingCharacter extends Character{
                     }
                 }
                 // Left right travel
-                else if (abs(targetObject.getX() - this.getX()) > abs(targetObject.getY() - this.getY())) {
-                    if (targetObject.getX() > this.getX() + 1) {
+                else if (abs(getTargetX() - this.getX()) > abs(getTargetY() - this.getY())) {
+                    if (getTargetX() > this.getX() + 1) {
                         this.setAnimation(AnimationDirection.RIGHT);
                         this.setX(this.getX() + delta * characterSpeed);
                     } else {
@@ -107,7 +111,7 @@ public class ChasingCharacter extends Character{
                 }
                 // Up down travel
                 else {
-                    if (targetObject.getY() > this.getY() + 1) {
+                    if (getTargetY() > this.getY() + 1) {
                         this.setAnimation(AnimationDirection.DOWN);
                         this.setY(this.getY() + delta * characterSpeed);
                     } else {

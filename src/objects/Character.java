@@ -37,26 +37,32 @@ public class Character extends GameObject{
         this.yPos = yPos;
     }
 
+    @Override
     public void setX(float xPos){
         this.xPos = xPos;
     }
 
+    @Override
     public void setY(float yPos){
         this.yPos = yPos;
     }
 
+    @Override
     public float getX(){
         return xPos;
     }
 
+    @Override
     public float getY(){
         return yPos;
     }
 
+    @Override
     public float getHeight(){
         return characterSprite.getHeight();
     }
 
+    @Override
     public float getWidth(){return characterSprite.getWidth();}
 
     public Animation getUpAnimation(){
