@@ -3,6 +3,9 @@ package game;
 import objects.*;
 import objects.Character;
 import org.newdawn.slick.*;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.tiled.TiledMap;
 
 import java.util.ArrayList;
@@ -16,24 +19,28 @@ import java.util.Random;
 public class XmasGame extends BasicGame {
 
     private TiledMap xmasMap;
-    private Image deathScreen, titleScreen, titleText1, titleText2;
+    private static final int SIZE = 64; // Tile size
+    private GameTileMap gameTiles;
+    private Image deathScreen, titleScreen;
+    private PlayerCharacter playerCharacter;
+    private int playerScore;
+    private int playerHPmax, playerHPcurrent;
     private Present xmasPresent;
     private ArrayList<ChasingCat> catSwarm;
-    /** The collision map indicating which tiles block movement – generated based on tile blocked property */
     private ArrayList<GameObject> targetList;
-    private GameTileMap gameTiles;
-    private static final int SIZE = 64; // Tile size
-    private int playerScore;
-    private PlayerCharacter playerCharacter;
-    private boolean playerAlive, gameStart;
     private Sound catHissSound;
-    private int playerHPmax, playerHPcurrent;
+    private boolean playerAlive, gameStart;
     private HealthBar healthBar;
     private Music mainMusic, deathMusic, titleMusic;
     private Sound santaTaunt;
+    private Animation titleCat, titleCharacter;
+    private UnicodeFont scoreFont, titleFont, instructionFont;
+    private Color titleColor;
+    private int blinkTimer;
+    private float titleYPos, titleCharX, titleCharY;
 
     public XmasGame() {
-        super("Xmas Game");
+        super("Xmas Game - 2016");
     }
 
     public static void main(String[] arguments) {
@@ -53,8 +60,6 @@ public class XmasGame extends BasicGame {
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
         deathScreen = new Image("assets/other/death_screen.png");
         titleScreen = new Image("assets/other/open_title_screen.png");
-        titleText1 = new Image("assets/other/open_title_text_1.png");
-        titleText2 = new Image("assets/other/open_title_text_2.png");
 
         // Defining music and sounds
         catHissSound = new Sound("assets/sounds/cat_death_sound.wav");
@@ -62,7 +67,6 @@ public class XmasGame extends BasicGame {
         deathMusic = new Music("assets/sounds/emmanuel_song.wav");
         titleMusic = new Music("assets/sounds/little_drummer_boy_song.wav");
         santaTaunt = new Sound("assets/sounds/santa_ho.wav");
-        //mainMusic.loop();
 
         // Initializing player data
         playerScore = 0;
@@ -71,6 +75,27 @@ public class XmasGame extends BasicGame {
         healthBar = new HealthBar(playerHPmax, playerHPcurrent);
         playerAlive = true;
         gameStart = false;
+
+        // Defining fonts
+        scoreFont = new UnicodeFont("assets/fonts/zig.ttf", 20, false, false);
+        titleFont = new UnicodeFont("assets/fonts/arcade.ttf", 120, false, false);
+        instructionFont = new UnicodeFont("assets/fonts/kongtext.ttf", 40, false, false);
+        titleColor = Color.green;
+
+        scoreFont.addAsciiGlyphs();
+        scoreFont.getEffects().add(new ColorEffect());
+        scoreFont.loadGlyphs();
+
+        titleFont.addAsciiGlyphs();
+        titleFont.getEffects().add(new ColorEffect());
+        titleFont.loadGlyphs();
+
+        instructionFont.addAsciiGlyphs();
+        instructionFont.getEffects().add(new ColorEffect());
+        instructionFont.loadGlyphs();
+
+        blinkTimer = 0;
+        titleYPos = container.getHeight();
 
         // building collision and game maps based on tile properties in the TileD map
         targetList = new ArrayList<>();
@@ -146,6 +171,18 @@ public class XmasGame extends BasicGame {
 
         targetList.add(playerCharacter);
 
+        // Title Animation Characters
+        titleCharacter = new Animation(movementRight, duration, false);
+        titleCharacter.setLooping(true);
+        titleCharX = 0;
+        titleCharY = container.getHeight();
+        titleCat = new Animation(new Image [] {
+                new Image("assets/characters/zelda/zelda_right_1.png"),
+                new Image("assets/characters/zelda/zelda_right_2.png"),
+                new Image("assets/characters/zelda/zelda_right_3.png")},
+                new int[]{100, 100, 100}, false);
+        titleCat.setLooping(true);
+
         // Generating cat swarm
         catSwarm = new ArrayList<>();
         int initialCatCount = 1; // Total number of cats that appear on screen a the same time
@@ -170,24 +207,28 @@ public class XmasGame extends BasicGame {
             if (playerCharacter.isColliding(xmasPresent) && !xmasPresent.isCollected()) {
                 xmasPresent.collected();
                 playerScore += 1;
+                // Increase difficulty as more presents are collected.
                 if (playerScore == 5) {
                     catSwarm.add(new ChasingCat(playerCharacter));
                     catSwarm.add(new ChasingCat(playerCharacter));
                 } else if (playerScore == 15) {
-                    catSwarm.add(new ChasingCat(playerCharacter));
                     catSwarm.add(new ChasingCat(playerCharacter));
                 } else if (playerScore == 25) {
                     catSwarm.add(new ChasingCat(playerCharacter));
                     catSwarm.add(new ChasingCat(playerCharacter));
                 } else if (playerScore == 40) {
                     catSwarm.add(new ChasingCat(playerCharacter));
-                    catSwarm.add(new ChasingCat(playerCharacter));
-                    catSwarm.add(new ChasingCat(playerCharacter));
                 } else if (playerScore == 50) {
+                    // Reward for collecting 50 presents!
                     playerHPcurrent = playerHPmax;
-                } else if (playerScore == 100) {
+                }else if (playerScore == 75){
+                    playerHPcurrent = playerHPmax;
+                    catSwarm.add(new ChasingCat(playerCharacter));
+                    catSwarm.add(new ChasingCat(playerCharacter));
+                }  if (playerScore == 100) {
+                    // Impossible mode!
                     for (ChasingCat cat : catSwarm) {
-                        cat.setCharacterSpeed(0.4f);
+                        cat.setCharacterSpeed(0.25f);
                     }
                 }
             }
@@ -216,23 +257,56 @@ public class XmasGame extends BasicGame {
                 playerAlive = false;
             }
         }
-        else if (!gameStart){
+        else if (!gameStart){ // We are on the Starting Title Screen
             if (!titleMusic.playing()){
                 titleMusic.loop();
+                container.getInput().clearKeyPressedRecord();
+            }
+            if (titleMusic.getPosition() < 2){
+                container.getInput().clearKeyPressedRecord();
             }
             if(container.getInput().isKeyPressed(Input.KEY_RETURN)){
                 gameStart = true;
             }
+            // Defining blinking action for Title text.
+            if (blinkTimer < 1000){
+                blinkTimer += delta;
+            } else {
+                blinkTimer = 0;
+            }
+            if (blinkTimer >= 500){
+                titleColor = Color.green;
+            } else{
+              titleColor = Color.red;
+            }
+            if (titleYPos >= 64f && titleMusic.getPosition() > 1f){
+                titleYPos -= delta * .085f;
+            }
+            if (titleMusic.getPosition() > 9f){
+                if (titleCharX >= container.getWidth() + titleCat.getWidth() + titleCharacter.getWidth() + 80f){
+                    titleCharX = 0;
+                    titleCharY = 400;
+                }else {
+                    titleCharX += delta * 0.09f;
+                    titleCharY = 400;
+                }
+                titleCharacter.update(delta);
+                titleCat.update(delta);
+            }
         }
-        else{
+        else{ // We are on the Death Screen
             if (mainMusic.playing()){
                 mainMusic.stop();
                 santaTaunt.play();
+                container.getInput().clearKeyPressedRecord();
             }
             else if (!mainMusic.playing() && !santaTaunt.playing() && !deathMusic.playing()){
                 deathMusic.loop();
+                container.getInput().clearKeyPressedRecord();
             }
-            if(container.getInput().isKeyPressed(Input.KEY_RETURN)){
+            else if(deathMusic.getPosition() < 2){
+                container.getInput().clearKeyPressedRecord();
+            } else if (container.getInput().isKeyPressed(Input.KEY_RETURN)){
                 this.init(container);
             }
         }
@@ -255,18 +329,27 @@ public class XmasGame extends BasicGame {
         xmasMap.render(0,0, MapLayers.FOREGROUND.getValue());
 
         // Rendering player score and health
-        g.drawString("PRESENTS COLLECTED: " + playerScore, 267, 668);
-
+        scoreFont.drawString(260, 665, "PRESENTS COLLECTED:" + playerScore, Color.white);
         healthBar.draw(32, 660, playerHPcurrent);
 
         // show the death screen
         if (!playerAlive && deathMusic.getPosition() >  1){
             deathScreen.draw(0,0);
         }
+        // Show Title Screen
         if (!gameStart){
+            String titleText = "XMAS GAME";
+            float titleWidth = titleFont.getWidth(titleText);
             titleScreen.draw(0,0);
-            titleText1.draw(32,32);
-            titleText2.draw(32,704-titleText2.getHeight()*2);
+            titleFont.drawString(container.getWidth()/2 - titleWidth/2,titleYPos,titleText, titleColor);
+            titleFont.drawString(container.getWidth()/2 - titleFont.getWidth("2016")/2,
+                    titleYPos + titleFont.getHeight(titleText) + 10f, "2016", titleColor);
+            if (titleMusic.getPosition() >= 9f){
+                instructionFont.drawString(container.getWidth()/2 - instructionFont.getWidth("Press Enter")/2,
+                        container.getHeight()-128f, "Press Enter", Color.red);
+                titleCharacter.draw(titleCharX, titleCharY);
+                titleCat.draw(titleCharX - 70f, (titleCharY + titleCharacter.getHeight()) - titleCat.getHeight());
+            }
         }
 
     }

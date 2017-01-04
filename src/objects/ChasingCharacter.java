@@ -46,6 +46,7 @@ public class ChasingCharacter extends Character{
     public void kill(){
         isDying = true;
         this.setAnimation(dyingAnim);
+        deathSound.play();
     }
 
     public void setAlive(){
@@ -78,7 +79,6 @@ public class ChasingCharacter extends Character{
             // If character has reached its target... kill it!
             if (this.isColliding(targetObject)) {
                 this.kill();
-                deathSound.play();
             } else {
                 // When traveling diagonally maintain last animation direction
                 if (abs(getTargetX() - this.getX()) + 1 > abs(getTargetY() - this.getY()) &&
