@@ -16,7 +16,7 @@ import java.util.Random;
 public class XmasGame extends BasicGame {
 
     private TiledMap xmasMap;
-    private Image deathScreen;
+    private Image deathScreen, titleScreen, titleText1, titleText2;
     private Present xmasPresent;
     private ArrayList<ChasingCat> catSwarm;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
@@ -25,11 +25,11 @@ public class XmasGame extends BasicGame {
     private static final int SIZE = 64; // Tile size
     private int playerScore;
     private PlayerCharacter playerCharacter;
-    private boolean playerAlive;
+    private boolean playerAlive, gameStart;
     private Sound catHissSound;
     private int playerHPmax, playerHPcurrent;
     private HealthBar healthBar;
-    private Music mainMusic, deathMusic, openingMusic;
+    private Music mainMusic, deathMusic, titleMusic;
     private Sound santaTaunt;
 
     public XmasGame() {
@@ -52,13 +52,17 @@ public class XmasGame extends BasicGame {
         // Defining game map asset
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
         deathScreen = new Image("assets/other/death_screen.png");
+        titleScreen = new Image("assets/other/open_title_screen.png");
+        titleText1 = new Image("assets/other/open_title_text_1.png");
+        titleText2 = new Image("assets/other/open_title_text_2.png");
 
         // Defining music and sounds
         catHissSound = new Sound("assets/sounds/cat_death_sound.wav");
         mainMusic = new Music("assets/sounds/gloria_song.wav");
         deathMusic = new Music("assets/sounds/emmanuel_song.wav");
+        titleMusic = new Music("assets/sounds/little_drummer_boy_song.wav");
         santaTaunt = new Sound("assets/sounds/santa_ho.wav");
-        mainMusic.loop();
+        //mainMusic.loop();
 
         // Initializing player data
         playerScore = 0;
@@ -66,6 +70,7 @@ public class XmasGame extends BasicGame {
         playerHPcurrent = playerHPmax;
         healthBar = new HealthBar(playerHPmax, playerHPcurrent);
         playerAlive = true;
+        gameStart = false;
 
         // building collision and game maps based on tile properties in the TileD map
         targetList = new ArrayList<>();
@@ -74,7 +79,7 @@ public class XmasGame extends BasicGame {
             for (int yAxis=0; yAxis < xmasMap.getHeight(); yAxis++) {
                 // Getting spawn points and goal blocks
                 int tileID = xmasMap.getTileId(xAxis, yAxis, MapLayers.GAME.getValue());
-                // Building map of player spawn points... TODO: Implement player spawn map
+                // Building map of present spawn points
                 String value = xmasMap.getTileProperty(tileID, "presentSpawn", "false");
                 if ("true".equals(value)) {
                     gameTiles.getTile(xAxis, yAxis).setPresentSpawn(true);
@@ -84,7 +89,7 @@ public class XmasGame extends BasicGame {
                 if ("true".equals(value)) {
                     gameTiles.getTile(xAxis, yAxis).setCatSpawn(true);
                 }
-                // Building goal map.... TODO: Implement goal map.
+                // Building goal map
                 value = xmasMap.getTileProperty(tileID, "goal", "false");
                 if ("true".equals(value)) {
                     gameTiles.getTile(xAxis, yAxis).setTarget(true);
@@ -152,7 +157,11 @@ public class XmasGame extends BasicGame {
 
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
-        if (playerAlive) {
+        if (playerAlive && gameStart) {
+            if (titleMusic.playing()){
+                titleMusic.stop();
+                mainMusic.loop();
+            }
             // Spawning more cats
             spawnCats();
 
@@ -207,6 +216,14 @@ public class XmasGame extends BasicGame {
                 playerAlive = false;
             }
         }
+        else if (!gameStart){
+            if (!titleMusic.playing()){
+                titleMusic.loop();
+            }
+            if(container.getInput().isKeyPressed(Input.KEY_RETURN)){
+                gameStart = true;
+            }
+        }
         else{
             if (mainMusic.playing()){
                 mainMusic.stop();
@@ -215,7 +232,7 @@ public class XmasGame extends BasicGame {
             else if (!mainMusic.playing() && !santaTaunt.playing() && !deathMusic.playing()){
                 deathMusic.loop();
             }
-            if(container.getInput().isKeyDown(Input.KEY_RETURN)){
+            if(container.getInput().isKeyPressed(Input.KEY_RETURN)){
                 this.init(container);
             }
         }
@@ -245,6 +262,11 @@ public class XmasGame extends BasicGame {
         // show the death screen
         if (!playerAlive && deathMusic.getPosition() >  1){
             deathScreen.draw(0,0);
+        }
+        if (!gameStart){
+            titleScreen.draw(0,0);
+            titleText1.draw(32,32);
+            titleText2.draw(32,704-titleText2.getHeight()*2);
         }
 
     }
