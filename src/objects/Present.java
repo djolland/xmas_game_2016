@@ -86,34 +86,20 @@ public class Present extends GameObject{
     }
 
     @Override
-    public float getHeight() {
-        return currentAnimation.getHeight();
-    }
+    public float getHeight() {return currentAnimation.getHeight();}
 
     @Override
-    public float getWidth() {
-        return currentAnimation.getWidth();
-    }
+    public float getWidth() {return currentAnimation.getWidth();}
 
-    public Animation getCurrentAnimation(){
-        return this.currentAnimation;
-    }
+    public Animation getCurrentAnimation(){return this.currentAnimation;}
 
-    public boolean isVisible(){
-        return isVisible;
-    }
+    public boolean isVisible(){return isVisible;}
 
-    public boolean isCollected(){
-        return this.isCollected;
-    }
+    public boolean isCollected(){return this.isCollected;}
 
-    public void playVisibleAnimation(){
-        currentAnimation = visibleAnimation;
-    }
+    public void playVisibleAnimation(){currentAnimation = visibleAnimation;}
 
-    public void playCollectedAnimation(){
-        currentAnimation = collectedAnimation;
-    }
+    public void playCollectedAnimation(){currentAnimation = collectedAnimation;}
 
     public void draw(){
         if (currentAnimation == collectedAnimation) {

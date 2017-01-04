@@ -63,9 +63,9 @@ public class XmasGame extends BasicGame {
                 // Getting spawn points and goal blocks
                 int tileID = xmasMap.getTileId(xAxis, yAxis, MapLayers.GAME.getValue());
                 // Building map of player spawn points... TODO: Implement player spawn map
-                String value = xmasMap.getTileProperty(tileID, "playerSpawn", "false");
+                String value = xmasMap.getTileProperty(tileID, "presentSpawn", "false");
                 if ("true".equals(value)) {
-                    gameTiles.getTile(xAxis, yAxis).setPlayerSpawn(true);
+                    gameTiles.getTile(xAxis, yAxis).setPresentSpawn(true);
                 }
                 // Building map of cat spawn points.
                 value = xmasMap.getTileProperty(tileID, "catSpawn", "false");
@@ -193,13 +193,18 @@ public class XmasGame extends BasicGame {
         //generate random location until non-blocked location found
         Random rand = new Random();
 
-        int xPos = rand.nextInt(xmasMap.getWidth());
-        int yPos = rand.nextInt(xmasMap.getHeight());
-        while (gameTiles.getTile(xPos, yPos).isBlocked()){
-            xPos = rand.nextInt(xmasMap.getWidth());
-            yPos = rand.nextInt(xmasMap.getHeight());
+        int xPos = rand.nextInt(xmasMap.getWidth()-1);
+        int yPos = rand.nextInt(xmasMap.getHeight()-1);
+        // Continue to generate a random spawn point if current tile is not a present spawn point or
+        // the generated spawn point is within 2 tiles of the last present location.
+        while (!gameTiles.getTile(xPos, yPos).isPresentSpawn() ||
+                ((xPos < (int) xmasPresent.getX()/SIZE + 2 && xPos > (int) xmasPresent.getX()/SIZE - 2) &&
+                (yPos < (int) xmasPresent.getY()/SIZE + 2 && yPos > (int) xmasPresent.getY()/SIZE - 2))){
+            xPos = rand.nextInt(xmasMap.getWidth()-1);
+            yPos = rand.nextInt(xmasMap.getHeight()-1);
         }
-        xmasPresent.setPosition(xPos * SIZE, yPos * SIZE);
+        xmasPresent.setPosition((xPos * SIZE + SIZE/2),
+                                (yPos * SIZE + SIZE/2));
         xmasPresent.setVisible();
     }
 
@@ -218,8 +223,12 @@ public class XmasGame extends BasicGame {
                 }
                 cat.setPosition(xPos * SIZE + SIZE/2, yPos * SIZE + SIZE/2);
                 cat.setAlive();
-                cat.setTargetObject(targetList.get(rand.nextInt(targetList.size())));
-                catHissSound.play();
+                GameObject catTarget = targetList.get(rand.nextInt(targetList.size()));
+                cat.setTargetObject(catTarget);
+                // If the spawned cat is targeting the player - play the cat his sound!
+                if (catTarget == playerCharacter) {
+                    catHissSound.play(); // this thing is really annoying, just like the real thing!
+                }
                 spawnedList[xPos][yPos] = true;
             }
         }

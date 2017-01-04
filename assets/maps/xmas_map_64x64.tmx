@@ -53,7 +53,7 @@
   </tile>
   <tile id="1">
    <properties>
-    <property name="playerSpawn" type="bool" value="true"/>
+    <property name="presentSpawn" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="2">
@@ -74,7 +74,7 @@
  </layer>
  <layer name="game" width="10" height="10">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC2NgIB4IkiEnSEAfMUCYSDlkthAUE2MGpQDZf8JodpHqdwCqyqLjkAEAAA==
+   H4sIAAAAAAAAC2NgIB4IEiknhCaOS44BTRyXnDAee4VxsNHNw2cGpUAQyS5hJLuEGPCHGTYAAPUN8ZGQAQAA
   </data>
  </layer>
 </map>

@@ -11,7 +11,7 @@ public class GameTile extends GameObject {
 
     private int xPos, yPos;
     private float tileHeight, tileWidth;
-    private boolean isBlocked, isCatSpawn, isPlayerSpawn, isTarget;
+    private boolean isBlocked, isCatSpawn, isPresentSpawn, isTarget;
 
     public GameTile(int xPos, int yPos, float tileHeight, float tileWidth){
         this.xPos = xPos;
@@ -20,7 +20,7 @@ public class GameTile extends GameObject {
         this.tileWidth = tileWidth;
         this.isBlocked = false;
         this.isCatSpawn = false;
-        this.isPlayerSpawn = false;
+        this.isPresentSpawn = false;
         this.isTarget = false;
     }
 
@@ -31,7 +31,7 @@ public class GameTile extends GameObject {
         this.tileWidth = tileWidth;
         this.isBlocked = isBlocked;
         this.isCatSpawn = false;
-        this.isPlayerSpawn = false;
+        this.isPresentSpawn = false;
         this.isTarget = false;
     }
 
@@ -53,7 +53,7 @@ public class GameTile extends GameObject {
 
     public boolean isCatSpawn(){return isCatSpawn;}
 
-    public boolean isPlayerSpawn(){return isPlayerSpawn;}
+    public boolean isPresentSpawn(){return isPresentSpawn;}
 
     public boolean isTarget(){return isTarget;}
 
@@ -75,7 +75,7 @@ public class GameTile extends GameObject {
 
     public void setCatSpawn(boolean catSpawn){this.isCatSpawn = catSpawn;}
 
-    public void setPlayerSpawn(boolean playerSpawn){this.isPlayerSpawn = playerSpawn;}
+    public void setPresentSpawn(boolean presentSpawn){this.isPresentSpawn = presentSpawn;}
 
     public void setTarget(boolean target){this.isTarget = target;}
 

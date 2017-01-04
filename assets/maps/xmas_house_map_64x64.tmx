@@ -58,7 +58,7 @@
   </tile>
   <tile id="1">
    <properties>
-    <property name="playerSpawn" type="bool" value="true"/>
+    <property name="presentSpawn" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="2">
