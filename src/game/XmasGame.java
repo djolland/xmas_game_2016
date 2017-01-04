@@ -16,6 +16,7 @@ import java.util.Random;
 public class XmasGame extends BasicGame {
 
     private TiledMap xmasMap;
+    private Image deathScreen;
     private Present xmasPresent;
     private ArrayList<ChasingCat> catSwarm;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
@@ -29,6 +30,7 @@ public class XmasGame extends BasicGame {
     private int playerHPmax, playerHPcurrent;
     private HealthBar healthBar;
     private Music mainMusic, deathMusic, openingMusic;
+    private Sound santaTaunt;
 
     public XmasGame() {
         super("Xmas Game");
@@ -49,11 +51,13 @@ public class XmasGame extends BasicGame {
     public void init(GameContainer container) throws SlickException {
         // Defining game map asset
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
+        deathScreen = new Image("assets/other/death_screen.png");
 
         // Defining music and sounds
         catHissSound = new Sound("assets/sounds/cat_death_sound.wav");
         mainMusic = new Music("assets/sounds/gloria_song.wav");
         deathMusic = new Music("assets/sounds/emmanuel_song.wav");
+        santaTaunt = new Sound("assets/sounds/santa_ho.wav");
         mainMusic.loop();
 
         // Initializing player data
@@ -206,9 +210,13 @@ public class XmasGame extends BasicGame {
         else{
             if (mainMusic.playing()){
                 mainMusic.stop();
+                santaTaunt.play();
             }
-            if (!deathMusic.playing()){
+            else if (!mainMusic.playing() && !santaTaunt.playing() && !deathMusic.playing()){
                 deathMusic.loop();
+            }
+            if(container.getInput().isKeyDown(Input.KEY_RETURN)){
+                this.init(container);
             }
         }
 
@@ -233,6 +241,12 @@ public class XmasGame extends BasicGame {
         g.drawString("PRESENTS COLLECTED: " + playerScore, 267, 668);
 
         healthBar.draw(32, 660, playerHPcurrent);
+
+        // show the death screen
+        if (!playerAlive && deathMusic.getPosition() >  1){
+            deathScreen.draw(0,0);
+        }
+
     }
 
     private void spawnPresent(){
