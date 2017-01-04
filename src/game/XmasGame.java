@@ -24,9 +24,11 @@ public class XmasGame extends BasicGame {
     private static final int SIZE = 64; // Tile size
     private int playerScore;
     private PlayerCharacter playerCharacter;
+    private boolean playerAlive;
     private Sound catHissSound;
     private int playerHPmax, playerHPcurrent;
     private HealthBar healthBar;
+    private Music mainMusic, deathMusic, openingMusic;
 
     public XmasGame() {
         super("Xmas Game");
@@ -50,7 +52,8 @@ public class XmasGame extends BasicGame {
 
         // Defining music and sounds
         catHissSound = new Sound("assets/sounds/cat_death_sound.wav");
-        Music mainMusic = new Music("assets/sounds/gloria_song.wav");
+        mainMusic = new Music("assets/sounds/gloria_song.wav");
+        deathMusic = new Music("assets/sounds/emmanuel_song.wav");
         mainMusic.loop();
 
         // Initializing player data
@@ -58,6 +61,7 @@ public class XmasGame extends BasicGame {
         playerHPmax = 5;
         playerHPcurrent = playerHPmax;
         healthBar = new HealthBar(playerHPmax, playerHPcurrent);
+        playerAlive = true;
 
         // building collision and game maps based on tile properties in the TileD map
         targetList = new ArrayList<>();
@@ -135,8 +139,8 @@ public class XmasGame extends BasicGame {
 
         // Generating cat swarm
         catSwarm = new ArrayList<>();
-        int totalCats = 5; // Total number of cats on screen a the same time
-        for (int i = 0; i < totalCats; i++){
+        int initialCatCount = 1; // Total number of cats that appear on screen a the same time
+        for (int i = 0; i < initialCatCount; i++){
             catSwarm.add(new ChasingCat(playerCharacter));
         }
 
@@ -144,35 +148,67 @@ public class XmasGame extends BasicGame {
 
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
-        // Spawning more cats
-        spawnCats();
+        if (playerAlive) {
+            // Spawning more cats
+            spawnCats();
 
-        /* dealing with the presents */
-        xmasPresent.update(delta);
-        if (playerCharacter.isColliding(xmasPresent) && !xmasPresent.isCollected()){
-            xmasPresent.collected();
-            playerScore += 1;
-        }
-        if (!xmasPresent.isVisible()) {
-            spawnPresent();
-        }
-
-        /* updating player character */
-        playerCharacter.update(delta);
-
-        /* Updating CAT SWARM */
-        for (ChasingCat cat : catSwarm) {
-            if (cat.isAlive()) {
-                if (cat.isColliding(playerCharacter) && !cat.isDying()) {
-                    cat.kill();
-                    if (playerScore > 0) {
-                        playerScore--;
-                    }
-                    if (playerHPcurrent >= 0){
-                        playerHPcurrent--;
+            /* dealing with the presents */
+            xmasPresent.update(delta);
+            if (playerCharacter.isColliding(xmasPresent) && !xmasPresent.isCollected()) {
+                xmasPresent.collected();
+                playerScore += 1;
+                if (playerScore == 5) {
+                    catSwarm.add(new ChasingCat(playerCharacter));
+                    catSwarm.add(new ChasingCat(playerCharacter));
+                } else if (playerScore == 15) {
+                    catSwarm.add(new ChasingCat(playerCharacter));
+                    catSwarm.add(new ChasingCat(playerCharacter));
+                } else if (playerScore == 25) {
+                    catSwarm.add(new ChasingCat(playerCharacter));
+                    catSwarm.add(new ChasingCat(playerCharacter));
+                } else if (playerScore == 40) {
+                    catSwarm.add(new ChasingCat(playerCharacter));
+                    catSwarm.add(new ChasingCat(playerCharacter));
+                    catSwarm.add(new ChasingCat(playerCharacter));
+                } else if (playerScore == 50) {
+                    playerHPcurrent = playerHPmax;
+                } else if (playerScore == 100) {
+                    for (ChasingCat cat : catSwarm) {
+                        cat.setCharacterSpeed(0.4f);
                     }
                 }
-                cat.update(delta);
+            }
+            if (!xmasPresent.isVisible()) {
+                spawnPresent();
+            }
+
+            /* updating player character */
+            playerCharacter.update(delta);
+
+             /* Updating CAT SWARM */
+            for (ChasingCat cat : catSwarm) {
+                if (cat.isAlive()) {
+                    if (cat.isColliding(playerCharacter) && !cat.isDying()) {
+                        cat.kill();
+                        if (playerHPcurrent >= 0) {
+                            playerHPcurrent--;
+                        }
+                    }
+                    cat.update(delta);
+                }
+            }
+
+            // Checking if player should be dead
+            if (playerHPcurrent == 0) {
+                playerAlive = false;
+            }
+        }
+        else{
+            if (mainMusic.playing()){
+                mainMusic.stop();
+            }
+            if (!deathMusic.playing()){
+                deathMusic.loop();
             }
         }
 
