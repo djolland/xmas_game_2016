@@ -19,13 +19,14 @@ public class XmasGame extends BasicGame {
     private Present xmasPresent;
     private ArrayList<ChasingCat> catSwarm;
     /** The collision map indicating which tiles block movement – generated based on tile blocked property */
-    private boolean[][] goalBlock;
     private ArrayList<GameObject> targetList;
     private GameTileMap gameTiles;
     private static final int SIZE = 64; // Tile size
     private int playerScore;
     private PlayerCharacter playerCharacter;
     private Sound catHissSound;
+    private int playerHPmax, playerHPcurrent;
+    private HealthBar healthBar;
 
     public XmasGame() {
         super("Xmas Game");
@@ -44,9 +45,6 @@ public class XmasGame extends BasicGame {
 
     @Override
     public void init(GameContainer container) throws SlickException {
-        // Initializing score
-        playerScore = 0;
-
         // Defining game map asset
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
 
@@ -54,6 +52,12 @@ public class XmasGame extends BasicGame {
         catHissSound = new Sound("assets/sounds/cat_death_sound.wav");
         Music mainMusic = new Music("assets/sounds/gloria_song.wav");
         mainMusic.loop();
+
+        // Initializing player data
+        playerScore = 0;
+        playerHPmax = 5;
+        playerHPcurrent = playerHPmax;
+        healthBar = new HealthBar(playerHPmax, playerHPcurrent);
 
         // building collision and game maps based on tile properties in the TileD map
         targetList = new ArrayList<>();
@@ -124,8 +128,7 @@ public class XmasGame extends BasicGame {
         // Setting initial player position to right
         playerCharacter.setAnimation(Character.AnimationDirection.DOWN);
 
-        //Initializing player location
-        // TODO: replace this with spawnPlayer map logic
+        //Initializing player location at center of map
         playerCharacter.setPosition((xmasMap.getWidth()/2) * SIZE, (xmasMap.getHeight()/2) * SIZE);
 
         targetList.add(playerCharacter);
@@ -165,6 +168,9 @@ public class XmasGame extends BasicGame {
                     if (playerScore > 0) {
                         playerScore--;
                     }
+                    if (playerHPcurrent >= 0){
+                        playerHPcurrent--;
+                    }
                 }
                 cat.update(delta);
             }
@@ -175,7 +181,6 @@ public class XmasGame extends BasicGame {
     public void render(GameContainer container, Graphics g) throws SlickException {
         // Rendering the ground layer (last parameter is layer index)
         xmasMap.render(0, 0, MapLayers.BACKGROUND.getValue());
-        g.drawString("PRESENTS COLLECTED: " + playerScore, 32, 668);
         xmasPresent.draw();
         // Rendering Characters
         for (ChasingCat cat : catSwarm){
@@ -185,8 +190,13 @@ public class XmasGame extends BasicGame {
         }
         playerCharacter.draw();
 
-        //Rendering foliage layer over-top of Characters
+        // Rendering foliage layer over-top of Characters
         xmasMap.render(0,0, MapLayers.FOREGROUND.getValue());
+
+        // Rendering player score and health
+        g.drawString("PRESENTS COLLECTED: " + playerScore, 267, 668);
+
+        healthBar.draw(32, 660, playerHPcurrent);
     }
 
     private void spawnPresent(){
