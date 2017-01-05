@@ -1,13 +1,16 @@
 package game;
 
+import dao.HighScoreDAO;
 import objects.*;
 import objects.Character;
 import org.newdawn.slick.*;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.font.effects.ColorEffect;
+import org.newdawn.slick.gui.TextField;
 import org.newdawn.slick.tiled.TiledMap;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -38,6 +41,8 @@ public class XmasGame extends BasicGame {
     private Color titleColor;
     private int blinkTimer;
     private float titleYPos, titleCharX, titleCharY;
+    private final static HighScoreDAO scoreDAO = new HighScoreDAO();
+    private String[] highScores;
 
     public XmasGame() {
         super("Xmas Game - 2016");
@@ -75,6 +80,18 @@ public class XmasGame extends BasicGame {
         healthBar = new HealthBar(playerHPmax, playerHPcurrent);
         playerAlive = true;
         gameStart = false;
+
+        // Loading High Scores
+        try {
+            highScores = scoreDAO.loadScores("data/high_scores.txt");
+            for (String score : highScores){
+                if (score != null){
+                    System.out.println(score);
+                }
+            }
+        }catch (IOException e){
+            // Do Nothing... for now
+        }
 
         // Defining fonts
         scoreFont = new UnicodeFont("assets/fonts/zig.ttf", 20, false, false);
@@ -285,10 +302,10 @@ public class XmasGame extends BasicGame {
             if (titleMusic.getPosition() > 9f){
                 if (titleCharX >= container.getWidth() + titleCat.getWidth() + titleCharacter.getWidth() + 80f){
                     titleCharX = 0;
-                    titleCharY = 400;
+                    titleCharY = 380;
                 }else {
-                    titleCharX += delta * 0.09f;
-                    titleCharY = 400;
+                    titleCharX += delta * 0.07f;
+                    titleCharY = 380;
                 }
                 titleCharacter.update(delta);
                 titleCat.update(delta);
@@ -335,6 +352,46 @@ public class XmasGame extends BasicGame {
         // show the death screen
         if (!playerAlive && deathMusic.getPosition() >  1){
             deathScreen.draw(0,0);
+            String scoreString = "You Saved " + playerScore + " Presents";
+            float scoreHeight = (xmasMap.getHeight()/4) * SIZE;
+            scoreFont.drawString(
+                    (xmasMap.getWidth()/2) * SIZE - scoreFont.getWidth(scoreString)/2,
+                    scoreHeight,
+                    scoreString, Color.red);
+            scoreHeight += scoreFont.getHeight(scoreString) + 10f;
+            scoreFont.drawString(
+                    (xmasMap.getWidth()/2) * SIZE - scoreFont.getWidth("Before the Cats RUINED Xmas")/2,
+                    scoreHeight,
+                    "Before the Cats RUINED Xmas", Color.red);
+            /*
+            scoreHeight +=  30f;
+
+            // Getting player name
+            TextField enterName = new TextField(
+                    container, scoreFont,
+                    xmasMap.getWidth()/2 *64 - 25, (int) scoreHeight,
+                    50, 50);
+            enterName.setBackgroundColor(Color.black);
+            enterName.setBorderColor(Color.white);
+            enterName.setTextColor(Color.green);
+            enterName.setFocus(true);
+            enterName.render(container, g);*/
+
+            scoreHeight +=  50f;
+            scoreFont.drawString(
+                    (xmasMap.getWidth()/2) * SIZE - scoreFont.getWidth("High Score")/2,
+                    scoreHeight,
+                    "High Scores:", Color.white);
+            scoreHeight += scoreFont.getHeight("HS") + 25f;
+            for (String score : highScores){
+                if (score != null) {
+                    scoreFont.drawString(
+                            (xmasMap.getWidth() / 2) * SIZE - scoreFont.getWidth(score) / 2,
+                            scoreHeight,
+                            score, Color.green);
+                    scoreHeight += scoreFont.getHeight(score) + 10f;
+                }
+            }
         }
         // Show Title Screen
         if (!gameStart){
@@ -345,8 +402,17 @@ public class XmasGame extends BasicGame {
             titleFont.drawString(container.getWidth()/2 - titleFont.getWidth("2016")/2,
                     titleYPos + titleFont.getHeight(titleText) + 10f, "2016", titleColor);
             if (titleMusic.getPosition() >= 9f){
+                // Drawing title text
                 instructionFont.drawString(container.getWidth()/2 - instructionFont.getWidth("Press Enter")/2,
                         container.getHeight()-128f, "Press Enter", Color.red);
+                scoreFont.drawString(
+                        container.getWidth()/2 - scoreFont.getWidth("High Score:")/2, 500,
+                        "High Score:", Color.white);
+                scoreFont.drawString(
+                        container.getWidth()/2 - scoreFont.getWidth(highScores[0])/2,
+                        500 + scoreFont.getHeight("High Score:") + 10f,
+                        highScores[0], Color.white);
+                // Drawing characters walking across screen
                 titleCharacter.draw(titleCharX, titleCharY);
                 titleCat.draw(titleCharX - 70f, (titleCharY + titleCharacter.getHeight()) - titleCat.getHeight());
             }
