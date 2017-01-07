@@ -22,7 +22,12 @@ public class HealthBar {
         this.playerHPmax = playerHPmax;
     }
 
-    public void draw(float xPos, float yPos, int playerHPcurrent) throws SlickException {
+    public void update(int playerHPcurrent){
+        this.playerHPcurrent = playerHPcurrent;
+    }
+
+
+    public void draw(float xPos, float yPos) throws SlickException {
         int i = 0;
         for (Image heart : heartBar){
             if (i < playerHPcurrent){

@@ -273,7 +273,7 @@ public class XmasGame extends BasicGame {
                     cat.update(delta);
                 }
             }
-
+            healthBar.update(playerHPcurrent);
             // Checking if player should be dead
             if (playerHPcurrent <= 0) {
                 playerAlive = false;
@@ -354,7 +354,7 @@ public class XmasGame extends BasicGame {
 
         // Rendering player score and health
         scoreFont.drawString(260, 665, "PRESENTS COLLECTED:" + playerScore, Color.white);
-        healthBar.draw(32, 660, playerHPcurrent);
+        healthBar.draw(32, 660);
 
         // show the death screen
         if (!playerAlive && deathMusic.getPosition() >  1){

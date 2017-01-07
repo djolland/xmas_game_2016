@@ -52,7 +52,7 @@ public class HighScoreDAO {
                 row ++;
             }
             fileIn.close();
-            saveScores[0] = name + "," + score + "\n";
+            saveScores[0] = name + "," + score;
             String nextEntry = saveScores[0];
             for (int i = 0; i < loadedScores.length; i++){
                 if (loadedScores[i] == null){
