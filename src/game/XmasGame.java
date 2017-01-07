@@ -10,7 +10,6 @@ import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.gui.TextField;
 import org.newdawn.slick.tiled.TiledMap;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -43,6 +42,7 @@ public class XmasGame extends BasicGame {
     private float titleYPos, titleCharX, titleCharY;
     private final static HighScoreDAO scoreDAO = new HighScoreDAO();
     private String[] highScores;
+    private TextField enterName;
 
     public XmasGame() {
         super("Xmas Game - 2016");
@@ -81,17 +81,22 @@ public class XmasGame extends BasicGame {
         playerAlive = true;
         gameStart = false;
 
-        // Loading High Scores
-        try {
+        // Initializing High Score stuff
+        highScores = scoreDAO.loadScores("data/high_scores.txt");
+        if (highScores[0] == null){
+            scoreDAO.saveScore("data/high_scores.txt", "Dan The Man", 100);
             highScores = scoreDAO.loadScores("data/high_scores.txt");
-            for (String score : highScores){
-                if (score != null){
-                    System.out.println(score);
-                }
-            }
-        }catch (IOException e){
-            // Do Nothing... for now
         }
+
+        enterName = new TextField(
+                container, container.getDefaultFont(),
+                container.getWidth(), container.getHeight(),
+                200, 35);
+        enterName.setBackgroundColor(Color.black);
+        enterName.setBorderColor(Color.black);
+        enterName.setTextColor(Color.green);
+        enterName.setFocus(true);
+        enterName.setAcceptingInput(true);
 
         // Defining fonts
         scoreFont = new UnicodeFont("assets/fonts/zig.ttf", 20, false, false);
@@ -211,7 +216,7 @@ public class XmasGame extends BasicGame {
 
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
-        if (playerAlive && gameStart) {
+        if (playerAlive && gameStart) { // We are in the main game loop
             if (titleMusic.playing()){
                 titleMusic.stop();
                 mainMusic.loop();
@@ -270,7 +275,7 @@ public class XmasGame extends BasicGame {
             }
 
             // Checking if player should be dead
-            if (playerHPcurrent == 0) {
+            if (playerHPcurrent <= 0) {
                 playerAlive = false;
             }
         }
@@ -299,7 +304,7 @@ public class XmasGame extends BasicGame {
             if (titleYPos >= 64f && titleMusic.getPosition() > 1f){
                 titleYPos -= delta * .085f;
             }
-            if (titleMusic.getPosition() > 9f){
+            if (titleMusic.getPosition() > 9f){ // Send out the characters
                 if (titleCharX >= container.getWidth() + titleCat.getWidth() + titleCharacter.getWidth() + 80f){
                     titleCharX = 0;
                     titleCharY = 380;
@@ -324,10 +329,12 @@ public class XmasGame extends BasicGame {
             else if(deathMusic.getPosition() < 2){
                 container.getInput().clearKeyPressedRecord();
             } else if (container.getInput().isKeyPressed(Input.KEY_RETURN)){
+                if (enterName.getText() != ""){
+                    scoreDAO.saveScore("data/high_scores.txt", enterName.getText(), playerScore);
+                }
                 this.init(container);
             }
         }
-
     }
 
     public void render(GameContainer container, Graphics g) throws SlickException {
@@ -363,19 +370,18 @@ public class XmasGame extends BasicGame {
                     (xmasMap.getWidth()/2) * SIZE - scoreFont.getWidth("Before the Cats RUINED Xmas")/2,
                     scoreHeight,
                     "Before the Cats RUINED Xmas", Color.red);
-            /*
-            scoreHeight +=  30f;
+            scoreHeight += scoreFont.getHeight(scoreString) + 20f;
+            scoreFont.drawString(
+                    (xmasMap.getWidth()/2) * SIZE - scoreFont.getWidth("Enter Your Name:")/2,
+                    scoreHeight,
+                    "Enter Your Name:", Color.white);
 
-            // Getting player name
-            TextField enterName = new TextField(
-                    container, scoreFont,
-                    xmasMap.getWidth()/2 *64 - 25, (int) scoreHeight,
-                    50, 50);
-            enterName.setBackgroundColor(Color.black);
-            enterName.setBorderColor(Color.white);
-            enterName.setTextColor(Color.green);
+            scoreHeight +=  30f;
+            // Getting player name for high score
+            enterName.setLocation(xmasMap.getWidth()/2 *64 - 100, (int) scoreHeight);
+            enterName.render(container, g);
             enterName.setFocus(true);
-            enterName.render(container, g);*/
+            enterName.setAcceptingInput(true);
 
             scoreHeight +=  50f;
             scoreFont.drawString(

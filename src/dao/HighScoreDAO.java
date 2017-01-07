@@ -12,7 +12,9 @@ import java.util.Scanner;
  */
 public class HighScoreDAO {
 
-    public String[] loadScores(String filePath) throws IOException{
+    final static int MAXENTRIES = 10;
+
+    public String[] loadScores(String filePath) {
         Scanner fileIn;
         String[] returnScores = new String[10];
 
@@ -26,20 +28,21 @@ public class HighScoreDAO {
                 returnScores[row] = returnString;
                 row ++;
             }
+            fileIn.close();
         }
         catch (IOException e){
-            throw new IOException();
+            e.printStackTrace();
+            System.out.println("High Score File Not Found!");
         }
 
-        fileIn.close();
         return returnScores;
     }
 
-    public void saveScore(String filePath, String name, int score) throws IOException{
+    public void saveScore(String filePath, String name, int score) {
         FileWriter fileOut;
         Scanner fileIn;
-        String[] saveScores = new String[10];
-        String[] loadedScores = new String[10];
+        String[] saveScores = new String[MAXENTRIES];
+        String[] loadedScores = new String[MAXENTRIES];
 
         try{
             fileIn = new Scanner(new FileInputStream(filePath));
@@ -48,23 +51,35 @@ public class HighScoreDAO {
                 loadedScores[row] = fileIn.nextLine();
                 row ++;
             }
-            for (int i = 0; i > loadedScores.length; i++){
-                String[] line = fileIn.nextLine().split(",");
-                if(score > Integer.parseInt(line[1].trim())){
-                    saveScores[i] = name + "," + score;
-                }else {
-                    saveScores[i] = line[0] + "," + line[1].trim();
+            fileIn.close();
+            saveScores[0] = name + "," + score + "\n";
+            String nextEntry = saveScores[0];
+            for (int i = 0; i < loadedScores.length; i++){
+                if (loadedScores[i] == null){
+                    saveScores[i] = nextEntry;
+                    break;
+                }
+                else {
+                    if (Integer.parseInt(nextEntry.split(",")[1].trim()) >
+                            Integer.parseInt(loadedScores[i].split(",")[1].trim())) {
+                        saveScores[i] = nextEntry;
+                        nextEntry = loadedScores[i];
+                    } else {
+                        saveScores[i] = loadedScores[i];
+                    }
                 }
             }
-            fileIn.close();
             fileOut = new FileWriter(filePath);
-            for (int i = 0; i > saveScores.length; i++){
-                fileOut.write(saveScores[i] + '\n');
+            for (int i = 0; i < saveScores.length; i++){
+                if (saveScores[i] != null){
+                    fileOut.write(saveScores[i] + '\n');
+                }
             }
-
+            fileOut.close();
         }
         catch (IOException e){
-            throw new IOException();
+            e.printStackTrace();
+            System.out.println("High Score File Not Found!");
         }
     }
 }
