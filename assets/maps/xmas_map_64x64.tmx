@@ -72,7 +72,7 @@
    H4sIAAAAAAAAC2NgIB6wkiHHRoL5QxWQEy64AABJ/IvRkAEAAA==
   </data>
  </layer>
- <layer name="game" width="10" height="10">
+ <layer name="gamestates" width="10" height="10">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC2NgIB4IEiknhCaOS44BTRyXnDAee4VxsNHNw2cGpUAQyS5hJLuEGPCHGTYAAPUN8ZGQAQAA
   </data>

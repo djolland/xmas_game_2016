@@ -1,4 +1,4 @@
-package game;
+package gamestates;
 
 import dao.HighScoreDAO;
 import org.newdawn.slick.*;

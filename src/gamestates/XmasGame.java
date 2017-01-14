@@ -1,4 +1,4 @@
-package game;
+package gamestates;
 
 import objects.*;
 import objects.Character;
@@ -9,6 +9,8 @@ import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.tiled.TiledMap;
+import tilemap.GameTileMap;
+import tilemap.MapLayers;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -24,7 +26,7 @@ public class XmasGame extends BasicGameState {
     private MainApplication game;
 
     private TiledMap xmasMap;
-    private static final int SIZE = 64; // Tile size
+    private static final int TILESIZE = 64;
     private GameTileMap gameTiles;
     private PlayerCharacter playerCharacter;
     private int playerScore;
@@ -48,7 +50,7 @@ public class XmasGame extends BasicGameState {
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
         game = (MainApplication) stateBasedGame;
 
-        // Defining game map asset
+        // Defining gamestates map asset
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
 
         // Defining music and sounds
@@ -57,7 +59,7 @@ public class XmasGame extends BasicGameState {
         santaTaunt = new Sound("assets/sounds/santa_ho.wav");
 
         // Initializing player data
-        playerScore = 0;//game.playerScore;
+        playerScore = 0;//gamestates.playerScore;
         playerHPmax = 5;
         playerHPcurrent = playerHPmax;
         healthBar = new HealthBar(playerHPmax, playerHPcurrent);
@@ -76,9 +78,9 @@ public class XmasGame extends BasicGameState {
         instructionFont.getEffects().add(new ColorEffect());
         instructionFont.loadGlyphs();
 
-        // building collision and game maps based on tile properties in the TileD map
+        // building collision and gamestates maps based on tile properties in the TileD map
         targetList = new ArrayList<>();
-        gameTiles = new GameTileMap(xmasMap.getWidth(), xmasMap.getHeight(), SIZE, SIZE);
+        gameTiles = new GameTileMap(xmasMap.getWidth(), xmasMap.getHeight(), TILESIZE, TILESIZE);
         for (int xAxis=0; xAxis < xmasMap.getWidth(); xAxis++) {
             for (int yAxis=0; yAxis < xmasMap.getHeight(); yAxis++) {
                 // Getting spawn points and goal blocks
@@ -146,7 +148,7 @@ public class XmasGame extends BasicGameState {
         playerCharacter.setAnimation(Character.AnimationDirection.DOWN);
 
         //Initializing player location at center of map
-        playerCharacter.setPosition((xmasMap.getWidth()/2) * SIZE, (xmasMap.getHeight()/2) * SIZE);
+        playerCharacter.setPosition((xmasMap.getWidth()/2) * TILESIZE, (xmasMap.getHeight()/2) * TILESIZE);
 
         targetList.add(playerCharacter);
 
@@ -163,7 +165,7 @@ public class XmasGame extends BasicGameState {
 
     @Override
     public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int delta) throws SlickException {
-        if (playerAlive) { // We are in the main game loop
+        if (playerAlive) { // We are in the main gamestates loop
             // Spawning more cats
             spawnCats();
 
@@ -259,13 +261,13 @@ public class XmasGame extends BasicGameState {
         // Continue to generate a random spawn point if current tile is not a present spawn point or
         // the generated spawn point is within 2 tiles of the last present location.
         while (!gameTiles.getTile(xPos, yPos).isPresentSpawn() ||
-                ((xPos < (int) xmasPresent.getX()/SIZE + 2 && xPos > (int) xmasPresent.getX()/SIZE - 2) &&
-                (yPos < (int) xmasPresent.getY()/SIZE + 2 && yPos > (int) xmasPresent.getY()/SIZE - 2))){
+                ((xPos < (int) xmasPresent.getX()/ TILESIZE + 2 && xPos > (int) xmasPresent.getX()/ TILESIZE - 2) &&
+                (yPos < (int) xmasPresent.getY()/ TILESIZE + 2 && yPos > (int) xmasPresent.getY()/ TILESIZE - 2))){
             xPos = rand.nextInt(xmasMap.getWidth()-1);
             yPos = rand.nextInt(xmasMap.getHeight()-1);
         }
-        xmasPresent.setPosition((xPos * SIZE + SIZE/2),
-                                (yPos * SIZE + SIZE/2));
+        xmasPresent.setPosition((xPos * TILESIZE + TILESIZE /2),
+                                (yPos * TILESIZE + TILESIZE /2));
         xmasPresent.setVisible();
     }
 
@@ -282,7 +284,7 @@ public class XmasGame extends BasicGameState {
                     xPos = rand.nextInt(gameTiles.getWidth() - 1);
                     yPos = rand.nextInt(gameTiles.getHeight() - 1);
                 }
-                cat.setPosition(xPos * SIZE + SIZE/2, yPos * SIZE + SIZE/2);
+                cat.setPosition(xPos * TILESIZE + TILESIZE /2, yPos * TILESIZE + TILESIZE /2);
                 cat.setAlive();
                 GameObject catTarget = targetList.get(rand.nextInt(targetList.size()));
                 cat.setTargetObject(catTarget);

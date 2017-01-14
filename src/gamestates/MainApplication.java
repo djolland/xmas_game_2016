@@ -1,4 +1,4 @@
-package game;
+package gamestates;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.GameContainer;
@@ -26,7 +26,7 @@ public class MainApplication extends StateBasedGame {
 
     @Override
     public void initStatesList(GameContainer gameContainer) throws SlickException {
-        // First state added will be the one that is loaded first when game is launched
+        // First state added will be the one that is loaded first when gamestates is launched
         this.addState(new TitleScreen());
         this.addState(new XmasGame());
         this.addState(new DeathScreen());

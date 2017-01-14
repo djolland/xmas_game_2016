@@ -1,11 +1,11 @@
-package game;
+package tilemap;
 
 import objects.GameObject;
 
 /**
  * @author Daniel J. Holland
  * @version 1.0
- *          Created on 1/2/2017.
+ * Created on 1/2/2017.
  */
 public class GameTile extends GameObject {
 

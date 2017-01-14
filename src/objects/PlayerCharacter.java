@@ -1,6 +1,6 @@
 package objects;
 
-import game.GameTileMap;
+import tilemap.GameTileMap;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Input;
 

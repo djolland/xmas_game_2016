@@ -1,4 +1,4 @@
-package game;
+package tilemap;
 
 /**
  * @author Daniel J. Holland

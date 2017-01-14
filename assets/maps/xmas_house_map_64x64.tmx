@@ -77,7 +77,7 @@
    H4sIAAAAAAAAC2NgGBxAAIgFiVAnBMTCRKgTAWJRilw0MAAARY/ROJABAAA=
   </data>
  </layer>
- <layer name="game" width="10" height="10">
+ <layer name="gamestates" width="10" height="10">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAC2NgGAWDCQAADA0iRpABAAA=
   </data>
