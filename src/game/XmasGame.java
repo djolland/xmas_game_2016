@@ -1,13 +1,13 @@
 package game;
 
-import dao.HighScoreDAO;
 import objects.*;
 import objects.Character;
 import org.newdawn.slick.*;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.font.effects.ColorEffect;
-import org.newdawn.slick.gui.TextField;
+import org.newdawn.slick.state.BasicGameState;
+import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.tiled.TiledMap;
 
 import java.util.ArrayList;
@@ -18,12 +18,14 @@ import java.util.Random;
  * @version 1.0
  * Created on 12/23/2016.
  */
-public class XmasGame extends BasicGame {
+public class XmasGame extends BasicGameState {
+
+    public static final int ID = 1;
+    private MainApplication game;
 
     private TiledMap xmasMap;
     private static final int SIZE = 64; // Tile size
     private GameTileMap gameTiles;
-    private Image deathScreen, titleScreen;
     private PlayerCharacter playerCharacter;
     private int playerScore;
     private int playerHPmax, playerHPcurrent;
@@ -31,93 +33,48 @@ public class XmasGame extends BasicGame {
     private ArrayList<ChasingCat> catSwarm;
     private ArrayList<GameObject> targetList;
     private Sound catHissSound;
-    private boolean playerAlive, gameStart;
+    private boolean playerAlive;
     private HealthBar healthBar;
-    private Music mainMusic, deathMusic, titleMusic;
+    private Music mainMusic;
     private Sound santaTaunt;
-    private Animation titleCat, titleCharacter;
-    private UnicodeFont scoreFont, titleFont, instructionFont;
-    private Color titleColor;
-    private int blinkTimer;
-    private float titleYPos, titleCharX, titleCharY;
-    private final static HighScoreDAO scoreDAO = new HighScoreDAO();
-    private String[] highScores;
-    private TextField enterName;
+    private UnicodeFont scoreFont, instructionFont;
 
-    public XmasGame() {
-        super("Xmas Game - 2016");
-    }
-
-    public static void main(String[] arguments) {
-        try {
-            AppGameContainer app = new AppGameContainer(new XmasGame());
-            app.setDisplayMode(640, 704, false);
-            app.start();
-        }
-        catch (SlickException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public int getID() {
+        return ID;
     }
 
     @Override
-    public void init(GameContainer container) throws SlickException {
+    public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
+        game = (MainApplication) stateBasedGame;
+
         // Defining game map asset
         xmasMap = new TiledMap("assets/maps/xmas_map_64x64.tmx");
-        deathScreen = new Image("assets/other/death_screen.png");
-        titleScreen = new Image("assets/other/open_title_screen.png");
 
         // Defining music and sounds
         catHissSound = new Sound("assets/sounds/cat_death_sound.wav");
         mainMusic = new Music("assets/sounds/gloria_song.wav");
-        deathMusic = new Music("assets/sounds/emmanuel_song.wav");
-        titleMusic = new Music("assets/sounds/little_drummer_boy_song.wav");
         santaTaunt = new Sound("assets/sounds/santa_ho.wav");
 
         // Initializing player data
-        playerScore = 0;
+        playerScore = 0;//game.playerScore;
         playerHPmax = 5;
         playerHPcurrent = playerHPmax;
         healthBar = new HealthBar(playerHPmax, playerHPcurrent);
         playerAlive = true;
-        gameStart = false;
-
-        // Initializing High Score stuff
-        highScores = scoreDAO.loadScores("data/high_scores.txt");
-        if (highScores[0] == null){
-            scoreDAO.saveScore("data/high_scores.txt", "Dan The Man", 100);
-            highScores = scoreDAO.loadScores("data/high_scores.txt");
-        }
-
-        enterName = new TextField(
-                container, container.getDefaultFont(),
-                container.getWidth(), container.getHeight(),
-                200, 35);
-        enterName.setBackgroundColor(Color.black);
-        enterName.setBorderColor(Color.black);
-        enterName.setTextColor(Color.green);
-        enterName.setFocus(true);
-        enterName.setAcceptingInput(true);
+        //gameStart = false;
 
         // Defining fonts
         scoreFont = new UnicodeFont("assets/fonts/zig.ttf", 20, false, false);
-        titleFont = new UnicodeFont("assets/fonts/arcade.ttf", 120, false, false);
         instructionFont = new UnicodeFont("assets/fonts/kongtext.ttf", 40, false, false);
-        titleColor = Color.green;
 
         scoreFont.addAsciiGlyphs();
         scoreFont.getEffects().add(new ColorEffect());
         scoreFont.loadGlyphs();
 
-        titleFont.addAsciiGlyphs();
-        titleFont.getEffects().add(new ColorEffect());
-        titleFont.loadGlyphs();
-
         instructionFont.addAsciiGlyphs();
         instructionFont.getEffects().add(new ColorEffect());
         instructionFont.loadGlyphs();
-
-        blinkTimer = 0;
-        titleYPos = container.getHeight();
 
         // building collision and game maps based on tile properties in the TileD map
         targetList = new ArrayList<>();
@@ -183,7 +140,7 @@ public class XmasGame extends BasicGame {
                                               new Animation(movementDown, duration, false),
                                               new Animation(movementLeft, duration, false),
                                               new Animation(movementRight, duration, false),
-                                              container.getInput(), gameTiles);
+                                              gameContainer.getInput(), gameTiles);
 
         // Setting initial player position to right
         playerCharacter.setAnimation(Character.AnimationDirection.DOWN);
@@ -193,18 +150,6 @@ public class XmasGame extends BasicGame {
 
         targetList.add(playerCharacter);
 
-        // Title Animation Characters
-        titleCharacter = new Animation(movementRight, duration, false);
-        titleCharacter.setLooping(true);
-        titleCharX = 0;
-        titleCharY = container.getHeight();
-        titleCat = new Animation(new Image [] {
-                new Image("assets/characters/zelda/zelda_right_1.png"),
-                new Image("assets/characters/zelda/zelda_right_2.png"),
-                new Image("assets/characters/zelda/zelda_right_3.png")},
-                new int[]{100, 100, 100}, false);
-        titleCat.setLooping(true);
-
         // Generating cat swarm
         catSwarm = new ArrayList<>();
         int initialCatCount = 1; // Total number of cats that appear on screen a the same time
@@ -212,15 +157,13 @@ public class XmasGame extends BasicGame {
             catSwarm.add(new ChasingCat(playerCharacter));
         }
 
+        // Start up the music!
+        mainMusic.loop();
     }
 
     @Override
-    public void update(GameContainer container, int delta) throws SlickException {
-        if (playerAlive && gameStart) { // We are in the main game loop
-            if (titleMusic.playing()){
-                titleMusic.stop();
-                mainMusic.loop();
-            }
+    public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int delta) throws SlickException {
+        if (playerAlive) { // We are in the main game loop
             // Spawning more cats
             spawnCats();
 
@@ -277,67 +220,17 @@ public class XmasGame extends BasicGame {
             // Checking if player should be dead
             if (playerHPcurrent <= 0) {
                 playerAlive = false;
-            }
-        }
-        else if (!gameStart){ // We are on the Starting Title Screen
-            if (!titleMusic.playing()){
-                titleMusic.loop();
-                container.getInput().clearKeyPressedRecord();
-            }
-            if (titleMusic.getPosition() < 2){
-                container.getInput().clearKeyPressedRecord();
-            }
-            if(container.getInput().isKeyPressed(Input.KEY_RETURN)){
-                gameStart = true;
-            }
-            // Defining blinking action for Title text.
-            if (blinkTimer < 1000){
-                blinkTimer += delta;
-            } else {
-                blinkTimer = 0;
-            }
-            if (blinkTimer >= 500){
-                titleColor = Color.green;
-            } else{
-              titleColor = Color.red;
-            }
-            if (titleYPos >= 64f && titleMusic.getPosition() > 1f){
-                titleYPos -= delta * .085f;
-            }
-            if (titleMusic.getPosition() > 9f){ // Send out the characters
-                if (titleCharX >= container.getWidth() + titleCat.getWidth() + titleCharacter.getWidth() + 80f){
-                    titleCharX = 0;
-                    titleCharY = 380;
-                }else {
-                    titleCharX += delta * 0.07f;
-                    titleCharY = 380;
-                }
-                titleCharacter.update(delta);
-                titleCat.update(delta);
-            }
-        }
-        else{ // We are on the Death Screen
-            if (mainMusic.playing()){
                 mainMusic.stop();
                 santaTaunt.play();
-                container.getInput().clearKeyPressedRecord();
             }
-            else if (!mainMusic.playing() && !santaTaunt.playing() && !deathMusic.playing()){
-                deathMusic.loop();
-                container.getInput().clearKeyPressedRecord();
-            }
-            else if(deathMusic.getPosition() < 2){
-                container.getInput().clearKeyPressedRecord();
-            } else if (container.getInput().isKeyPressed(Input.KEY_RETURN)){
-                if (enterName.getText() != ""){
-                    scoreDAO.saveScore("data/high_scores.txt", enterName.getText(), playerScore);
-                }
-                this.init(container);
-            }
+        }
+        else if (!playerAlive && !santaTaunt.playing()){
+            game.enterState(DeathScreen.ID);
         }
     }
 
-    public void render(GameContainer container, Graphics g) throws SlickException {
+    @Override
+    public void render(GameContainer gameContainer, StateBasedGame stateBasedGame, Graphics graphics) throws SlickException {
         // Rendering the ground layer (last parameter is layer index)
         xmasMap.render(0, 0, MapLayers.BACKGROUND.getValue());
         xmasPresent.draw();
@@ -355,75 +248,6 @@ public class XmasGame extends BasicGame {
         // Rendering player score and health
         scoreFont.drawString(260, 665, "PRESENTS COLLECTED:" + playerScore, Color.white);
         healthBar.draw(32, 660);
-
-        // show the death screen
-        if (!playerAlive && deathMusic.getPosition() >  1){
-            deathScreen.draw(0,0);
-            String scoreString = "You Saved " + playerScore + " Presents";
-            float scoreHeight = (xmasMap.getHeight()/4) * SIZE;
-            scoreFont.drawString(
-                    (xmasMap.getWidth()/2) * SIZE - scoreFont.getWidth(scoreString)/2,
-                    scoreHeight,
-                    scoreString, Color.red);
-            scoreHeight += scoreFont.getHeight(scoreString) + 10f;
-            scoreFont.drawString(
-                    (xmasMap.getWidth()/2) * SIZE - scoreFont.getWidth("Before the Cats RUINED Xmas")/2,
-                    scoreHeight,
-                    "Before the Cats RUINED Xmas", Color.red);
-            scoreHeight += scoreFont.getHeight(scoreString) + 20f;
-            scoreFont.drawString(
-                    (xmasMap.getWidth()/2) * SIZE - scoreFont.getWidth("Enter Your Name:")/2,
-                    scoreHeight,
-                    "Enter Your Name:", Color.white);
-
-            scoreHeight +=  30f;
-            // Getting player name for high score
-            enterName.setLocation(xmasMap.getWidth()/2 *64 - 100, (int) scoreHeight);
-            enterName.render(container, g);
-            enterName.setFocus(true);
-            enterName.setAcceptingInput(true);
-
-            scoreHeight +=  50f;
-            scoreFont.drawString(
-                    (xmasMap.getWidth()/2) * SIZE - scoreFont.getWidth("High Score")/2,
-                    scoreHeight,
-                    "High Scores:", Color.white);
-            scoreHeight += scoreFont.getHeight("HS") + 25f;
-            for (String score : highScores){
-                if (score != null) {
-                    scoreFont.drawString(
-                            (xmasMap.getWidth() / 2) * SIZE - scoreFont.getWidth(score) / 2,
-                            scoreHeight,
-                            score, Color.green);
-                    scoreHeight += scoreFont.getHeight(score) + 10f;
-                }
-            }
-        }
-        // Show Title Screen
-        if (!gameStart){
-            String titleText = "XMAS GAME";
-            float titleWidth = titleFont.getWidth(titleText);
-            titleScreen.draw(0,0);
-            titleFont.drawString(container.getWidth()/2 - titleWidth/2,titleYPos,titleText, titleColor);
-            titleFont.drawString(container.getWidth()/2 - titleFont.getWidth("2016")/2,
-                    titleYPos + titleFont.getHeight(titleText) + 10f, "2016", titleColor);
-            if (titleMusic.getPosition() >= 9f){
-                // Drawing title text
-                instructionFont.drawString(container.getWidth()/2 - instructionFont.getWidth("Press Enter")/2,
-                        container.getHeight()-128f, "Press Enter", Color.red);
-                scoreFont.drawString(
-                        container.getWidth()/2 - scoreFont.getWidth("High Score:")/2, 500,
-                        "High Score:", Color.white);
-                scoreFont.drawString(
-                        container.getWidth()/2 - scoreFont.getWidth(highScores[0])/2,
-                        500 + scoreFont.getHeight("High Score:") + 10f,
-                        highScores[0], Color.white);
-                // Drawing characters walking across screen
-                titleCharacter.draw(titleCharX, titleCharY);
-                titleCat.draw(titleCharX - 70f, (titleCharY + titleCharacter.getHeight()) - titleCat.getHeight());
-            }
-        }
-
     }
 
     private void spawnPresent(){
@@ -470,4 +294,21 @@ public class XmasGame extends BasicGame {
             }
         }
     }
+
+    @Override
+    public void leave(GameContainer gameContainer , StateBasedGame sbg) {
+        gameContainer.getInput().clearKeyPressedRecord();
+    }
+
+    @Override
+    public void enter(GameContainer gameContainer , StateBasedGame sbg) {
+        gameContainer.getInput().clearKeyPressedRecord();
+        try {
+            this.init(gameContainer, game);
+        }
+        catch (SlickException e){
+            e.printStackTrace();
+        }
+    }
+
 }
