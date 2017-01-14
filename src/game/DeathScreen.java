@@ -33,7 +33,7 @@ public class DeathScreen extends BasicGameState {
     @Override
     public void init(GameContainer gameContainer, StateBasedGame stateBasedGame) throws SlickException {
         game = (MainApplication) stateBasedGame;
-        playerScore = game.playerScore;
+        playerScore = game.getPlayerScore();
 
         deathScreen = new Image("assets/other/death_screen.png");
         deathMusic = new Music("assets/sounds/emmanuel_song.wav");

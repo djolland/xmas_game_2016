@@ -16,7 +16,7 @@ public class TitleScreen extends BasicGameState{
     public static final int ID = 0;
     private MainApplication game;
 
-    private static final String titleText = " XMAS GAME";
+    private static final String titleText = "XMAS GAME";
     private Image titleScreen;
     private Music titleMusic;
     private Animation titleCat, titleCharacter;
@@ -92,8 +92,8 @@ public class TitleScreen extends BasicGameState{
     @Override
     public void render(GameContainer gameContainer, StateBasedGame stateBasedGame, Graphics graphics) throws SlickException {
         titleScreen.draw(0,0);
-        titleFont.drawString(gameContainer.getWidth()/2.2f - titleTextWidth/2, titleYPos, titleText, titleColor);
-        titleFont.drawString(gameContainer.getWidth()/2.2f - titleFont.getWidth("2016")/2,
+        titleFont.drawString(gameContainer.getWidth()/2f - titleTextWidth/2, titleYPos, titleText, titleColor);
+        titleFont.drawString(gameContainer.getWidth()/2f - titleFont.getWidth("2016")/2,
                 titleYPos + titleFont.getHeight(titleText) + 10f, "2016", titleColor);
         if (titleMusic.getPosition() >= 9f){
             // Drawing title text

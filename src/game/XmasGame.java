@@ -298,6 +298,7 @@ public class XmasGame extends BasicGameState {
     @Override
     public void leave(GameContainer gameContainer , StateBasedGame sbg) {
         gameContainer.getInput().clearKeyPressedRecord();
+        game.setPlayerScore(playerScore);
     }
 
     @Override

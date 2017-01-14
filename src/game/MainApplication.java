@@ -15,11 +15,10 @@ public class MainApplication extends StateBasedGame {
     // Application properties
     public static final int WIDTH = 640;
     public static final int HEIGHT = 704;
-    public static final int TILESIZE = 64;
     public static final int FPS = 120;
     public static final String GAMENAME = "XMas Game - 2016";
 
-    public int playerScore = 0;
+    private int playerScore = 0;
 
     public MainApplication(String appName){
         super(appName);
@@ -46,6 +45,12 @@ public class MainApplication extends StateBasedGame {
         }
     }
 
+    public void setPlayerScore(int score){
+        playerScore = score;
+    }
 
+    public int getPlayerScore(){
+        return playerScore;
+    }
 
 }
