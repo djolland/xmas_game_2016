@@ -12,11 +12,6 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 public class MainApplication extends StateBasedGame {
 
-    // Game state identifiers
-    public static final int TITLESCREEN = 0;
-    public static final int XMASGAME = 1;
-    public static final int DEATHSCREEN = 2;
-
     // Application properties
     public static final int WIDTH = 640;
     public static final int HEIGHT = 704;
@@ -43,7 +38,7 @@ public class MainApplication extends StateBasedGame {
             AppGameContainer app = new AppGameContainer(new MainApplication(GAMENAME));
             app.setDisplayMode(WIDTH, HEIGHT, false);
             app.setTargetFrameRate(FPS);
-            //app.setShowFPS(false);
+            app.setShowFPS(false);
             app.start();
         }
         catch (SlickException e){

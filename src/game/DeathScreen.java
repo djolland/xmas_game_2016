@@ -24,7 +24,6 @@ public class DeathScreen extends BasicGameState {
     private TextField enterName;
     private UnicodeFont scoreFont;
     private int playerScore;
-    private final static int TILESIZE = 64;
 
     @Override
     public int getID() {
@@ -55,6 +54,7 @@ public class DeathScreen extends BasicGameState {
         enterName.setBackgroundColor(Color.black);
         enterName.setBorderColor(Color.black);
         enterName.setTextColor(Color.green);
+        enterName.setCursorVisible(true);
         enterName.setFocus(true);
         enterName.setAcceptingInput(true);
 
@@ -67,39 +67,37 @@ public class DeathScreen extends BasicGameState {
         // show the death screen
         deathScreen.draw(0,0);
         String scoreString = "You Saved " + playerScore + " Presents";
-        float scoreHeight = (gameContainer.getHeight()/4) * game.TILESIZE;
+        float scoreHeight = (gameContainer.getHeight()/4);
         scoreFont.drawString(
-                (gameContainer.getWidth()/2) * game.TILESIZE - scoreFont.getWidth(scoreString)/2,
+                (gameContainer.getWidth()/2) - scoreFont.getWidth(scoreString)/2,
                 scoreHeight,
                 scoreString, Color.red);
         scoreHeight += scoreFont.getHeight(scoreString) + 10f;
         scoreFont.drawString(
-                (gameContainer.getWidth()/2) * game.TILESIZE - scoreFont.getWidth("Before the Cats RUINED Xmas")/2,
+                (gameContainer.getWidth()/2) - scoreFont.getWidth("Before the Cats RUINED Xmas")/2,
                 scoreHeight,
                 "Before the Cats RUINED Xmas", Color.red);
         scoreHeight += scoreFont.getHeight(scoreString) + 20f;
         scoreFont.drawString(
-                (gameContainer.getWidth()/2) * game.TILESIZE - scoreFont.getWidth("Enter Your Name:")/2,
+                (gameContainer.getWidth()/2) - scoreFont.getWidth("Enter Your Name:")/2,
                 scoreHeight,
                 "Enter Your Name:", Color.white);
 
         scoreHeight +=  30f;
         // Getting player name for high score
-        enterName.setLocation(gameContainer.getWidth()/2 *64 - 100, (int) scoreHeight);
+        enterName.setLocation(gameContainer.getWidth()/2 - 100, (int) scoreHeight);
         enterName.render(gameContainer, graphics);
-        enterName.setFocus(true);
-        enterName.setAcceptingInput(true);
 
         scoreHeight +=  50f;
         scoreFont.drawString(
-                (gameContainer.getWidth()/2) * game.TILESIZE - scoreFont.getWidth("High Score")/2,
+                (gameContainer.getWidth()/2) - scoreFont.getWidth("High Score")/2,
                 scoreHeight,
                 "High Scores:", Color.white);
         scoreHeight += scoreFont.getHeight("HS") + 25f;
         for (String score : highScores){
             if (score != null) {
                 scoreFont.drawString(
-                        (gameContainer.getWidth() / 2) * game.TILESIZE - scoreFont.getWidth(score) / 2,
+                        (gameContainer.getWidth() / 2) - scoreFont.getWidth(score) / 2,
                         scoreHeight,
                         score, Color.green);
                 scoreHeight += scoreFont.getHeight(score) + 10f;
@@ -111,7 +109,8 @@ public class DeathScreen extends BasicGameState {
     public void update(GameContainer gameContainer, StateBasedGame stateBasedGame, int delta) throws SlickException {
         if(deathMusic.getPosition() < 2){
             gameContainer.getInput().clearKeyPressedRecord();
-        } else if (gameContainer.getInput().isKeyPressed(Input.KEY_RETURN)){
+        }
+        else if (gameContainer.getInput().isKeyPressed(Input.KEY_RETURN)){
             if (!enterName.getText().equals("")){
                 scoreDAO.saveScore("data/high_scores.txt", enterName.getText(), playerScore);
             }
